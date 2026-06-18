@@ -9,6 +9,9 @@ export function Cursor() {
   const ring = useRef<HTMLDivElement>(null!)
 
   useEffect(() => {
+    // no custom cursor on touch / coarse-pointer devices — skip all work
+    if (window.matchMedia('(hover: none), (pointer: coarse)').matches) return
+
     let x = window.innerWidth / 2
     let y = window.innerHeight / 2
     let rx = x

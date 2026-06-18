@@ -68,6 +68,9 @@ export function ChatNavigator() {
     if (chatOpen) inputRef.current?.focus()
   }, [chatOpen])
 
+  // clear any queued debounced submit on unmount
+  useEffect(() => () => window.clearTimeout(debounce.current), [])
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setChatOpen(false)

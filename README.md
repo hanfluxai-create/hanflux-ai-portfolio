@@ -44,6 +44,15 @@ Works fully offline via local keyword matching. To enable optional LLM
 free-text interpretation, copy `.env.example` → `.env` and set the flag + key
 (see the security note in that file).
 
+## Deploy (Vercel)
+
+1. Push to GitHub, then import the repo at [vercel.com](https://vercel.com) (framework auto-detects as Vite).
+2. Build command `npm run build`, output dir `dist`. No `vercel.json` needed — it's a single-page app with no client router.
+3. Environment variables (all optional — the site works with none):
+   - `VITE_ENABLE_LLM_INTENT=false` (default)
+   - `VITE_LLM_PROXY_URL=https://your-app.vercel.app/api/intent` — **recommended** if enabling the LLM; keeps the real `ANTHROPIC_API_KEY` server-side.
+   - `VITE_ANTHROPIC_API_KEY` — demo-only; a `VITE_`-prefixed key is baked into the client bundle and visible to all visitors. Do not use in production.
+
 ## Build phases
 
 0. Scaffold + post-processing + cursor + debug ✅

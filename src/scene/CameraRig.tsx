@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { Object3D, Vector3 } from 'three'
 import { CONFIG } from '../config/config'
 import { useStore } from '../store/store'
+import { useReducedMotion } from '../hooks/useReducedMotion'
 
 /**
  * Module-singleton proxy the intro timeline (useIntro) tweens with GSAP.
@@ -14,6 +15,7 @@ export const introProxy = new Object3D()
 export function CameraRig() {
   const { camera } = useThree()
   const target = useMemo(() => new Vector3(), [])
+  const reduced = useReducedMotion()
 
   // seed the proxy pushed back (z = config z + 6) for the dolly-in
   useMemo(() => {
@@ -35,8 +37,13 @@ export function CameraRig() {
       // settled phase: ease toward the active section's framing
       const c = CONFIG.cam[st.section] ?? CONFIG.cam.intro
       target.set(c[0], c[1], c[2])
-      camera.position.lerp(target, 1 - Math.exp(-3 * dt))
-      if (st.flyTo && camera.position.distanceTo(target) < 0.025) st.clearFlyTo()
+      if (reduced) {
+        camera.position.copy(target)
+        if (st.flyTo) st.clearFlyTo()
+      } else {
+        camera.position.lerp(target, 1 - Math.exp(-3 * dt))
+        if (st.flyTo && camera.position.distanceTo(target) < 0.025) st.clearFlyTo()
+      }
     }
 
     camera.lookAt(0, 0, 0)

@@ -6,16 +6,16 @@ import { Preloader } from './components/Preloader'
 import { ChatNavigator } from './components/ChatNavigator'
 import { Fallback } from './components/Fallback'
 import { useWebGLSupported } from './hooks/useWebGLSupported'
-import { useIntro } from './intro/useIntro'
 import { useStore } from './store/store'
 
 // lazy so three/postprocessing fetch on Canvas mount, not on initial boot
 const Scene = lazy(() => import('./scene/Scene'))
+// lazy so GSAP + SplitText + ScrollTrigger stream off the critical path
+const IntroController = lazy(() => import('./intro/IntroController'))
 
 export default function App() {
   const webgl = useWebGLSupported()
   const setLoaded = useStore((s) => s.setLoaded)
-  useIntro()
 
   // no WebGL -> no scene to load, so clear the preloader and show the fallback
   useEffect(() => {
@@ -30,6 +30,12 @@ export default function App() {
         </Suspense>
       ) : (
         <Fallback />
+      )}
+
+      {webgl && (
+        <Suspense fallback={null}>
+          <IntroController />
+        </Suspense>
       )}
 
       <Preloader />

@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { CONFIG } from '../config/config'
 import { CAPABILITIES } from '../config/content'
 import { useStore } from '../store/store'
+import { useReducedMotion } from '../hooks/useReducedMotion'
 import { makeCardTexture } from '../lib/cardTexture'
 import {
   DISSOLVE_VERT,
@@ -13,9 +14,11 @@ import {
   dissolvePointSize,
 } from '../shaders/dissolve'
 
-const COLS = 120
-const ROWS = 76
-const DISSOLVE_SPAN = 0.82 // index-units from center over which a card dissolves
+// point-grid density per quality tier (cols x rows = points per card)
+const GRID = { high: [120, 76], medium: [88, 56], low: [48, 30] } as const
+// index-units from center over which a card dissolves. Wide enough that the
+// immediate neighbours read as partly-formed cards, not pure particle noise.
+const DISSOLVE_SPAN = 1.5
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
 const damp = (cur: number, target: number, lambda: number, dt: number) =>
   THREE.MathUtils.lerp(cur, target, 1 - Math.exp(-lambda * dt))
@@ -44,13 +47,42 @@ export function Carousel() {
   const setSelected = useStore((s) => s.setSelected)
   const setSection = useStore((s) => s.setSection)
   const setActiveIndex = useStore((s) => s.setActiveIndex)
+  const quality = useStore((s) => s.quality)
+  const section = useStore((s) => s.section)
+  const reduced = useReducedMotion()
+  const lastIdx = useRef(-1)
+
+  // density scales with the perf tier; reduced-motion uses a minimal grid
+  const [cols, rows] = reduced ? [44, 28] : GRID[quality]
 
   // one shared point-grid geometry across cards (read-only attributes)
   const geometry = useMemo(
-    () => buildDissolveGeometry(COLS, ROWS, C.planeW, C.planeH),
-    [C.planeW, C.planeH],
+    () => buildDissolveGeometry(cols, rows, C.planeW, C.planeH),
+    [cols, rows, C.planeW, C.planeH],
   )
   useEffect(() => () => geometry.dispose(), [geometry])
+
+  // clear an expanded card when navigating away from Work
+  useEffect(() => {
+    if (section !== 'work') setSelected(null)
+  }, [section, setSelected])
+
+  // keyboard navigation (arrow keys) — mirrors drag/wheel clamping
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return
+      if (e.key === 'ArrowLeft') {
+        target.current = clamp(target.current - 1, 0, last)
+        velocity.current = 0
+      } else if (e.key === 'ArrowRight') {
+        target.current = clamp(target.current + 1, 0, last)
+        velocity.current = 0
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [last])
 
   // regenerate textures once web fonts are ready so card type renders crisply
   const [texVersion, setTexVersion] = useState(0)
@@ -78,12 +110,12 @@ export function Carousel() {
       textures.map((tex) => ({
         uTexture: { value: tex },
         uProgress: { value: 1 },
-        uSize: { value: dissolvePointSize(C.planeW, C.planeH, COLS, ROWS) },
+        uSize: { value: dissolvePointSize(C.planeW, C.planeH, cols, rows) },
         uPointScale: { value: 300.0 },
         uPixelRatio: { value: dpr },
         uAdditive: { value: 0.3 },
       })),
-    [textures, C.planeW, C.planeH, dpr],
+    [textures, C.planeW, C.planeH, dpr, cols, rows],
   )
 
   // ---- drag + wheel on the canvas DOM element (NOT on meshes) ----
@@ -141,10 +173,13 @@ export function Carousel() {
   useFrame((_, dtRaw) => {
     const dt = Math.min(dtRaw, 1 / 30)
     const selected = useStore.getState().selected
+    // reduced-motion: snap instead of ease
+    const D = (cur: number, tgt: number, lambda = C.damp) =>
+      reduced ? tgt : damp(cur, tgt, lambda, dt)
 
     // inertia + snap when not dragging and nothing focused
     if (!dragging.current) {
-      if (Math.abs(velocity.current) > 0.0005 && selected === null) {
+      if (!reduced && Math.abs(velocity.current) > 0.0005 && selected === null) {
         target.current = clamp(target.current + velocity.current, 0, last)
         velocity.current *= 0.92
       } else {
@@ -152,10 +187,13 @@ export function Carousel() {
         target.current = Math.round(target.current)
       }
     }
-    scroll.current = damp(scroll.current, target.current, C.damp, dt)
+    scroll.current = D(scroll.current, target.current)
 
     const idx = clamp(Math.round(scroll.current), 0, last)
-    if (idx !== useStore.getState().activeIndex) setActiveIndex(idx)
+    if (idx !== lastIdx.current) {
+      lastIdx.current = idx
+      setActiveIndex(idx)
+    }
 
     for (let i = 0; i <= last; i++) {
       const g = groups.current[i]
@@ -170,19 +208,18 @@ export function Carousel() {
       const yaw = isFocused ? 0 : -o * C.yawPerStep
       const baseScale = isFocused ? 1.18 : isHover ? C.hoverScale : 1
 
-      g.position.x = damp(g.position.x, tx, C.damp, dt)
-      g.position.y = damp(g.position.y, 0, C.damp, dt)
-      g.position.z = damp(g.position.z, tz, C.damp, dt)
-      g.rotation.y = damp(g.rotation.y, yaw, C.damp, dt)
-      const s = damp(g.scale.x, baseScale, C.damp, dt)
-      g.scale.setScalar(s)
+      g.position.x = D(g.position.x, tx)
+      g.position.y = D(g.position.y, 0)
+      g.position.z = D(g.position.z, tz)
+      g.rotation.y = D(g.rotation.y, yaw)
+      g.scale.setScalar(D(g.scale.x, baseScale))
 
       // cull far cards from the draw (still cheap to keep them mounted)
-      g.visible = isFocused || Math.abs(o) < 2.4
+      g.visible = isFocused || Math.abs(o) < 2.6
 
       if (mat) {
-        const prog = isFocused ? 0 : clamp((Math.abs(o) - 0.1) / DISSOLVE_SPAN, 0, 1)
-        mat.uniforms.uProgress.value = damp(mat.uniforms.uProgress.value, prog, C.damp * 1.4, dt)
+        const prog = isFocused ? 0 : clamp((Math.abs(o) - 0.12) / DISSOLVE_SPAN, 0, 1)
+        mat.uniforms.uProgress.value = D(mat.uniforms.uProgress.value, prog, C.damp * 1.4)
       }
     }
   })

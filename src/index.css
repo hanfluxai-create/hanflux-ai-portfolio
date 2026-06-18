@@ -8,7 +8,7 @@
   --pink: #ff3d7f;
   --ink: #eef0f6;
   --ink-dim: #9aa0b4;
-  --ink-faint: #555b70;
+  --ink-faint: #7a8195; /* 5.2:1 on --bg — meets WCAG AA */
 
   --glass: rgba(12, 14, 22, 0.55);
   --hair: rgba(255, 255, 255, 0.1);
@@ -75,6 +75,27 @@ button {
   outline: 2px solid var(--teal);
   outline-offset: 3px;
   border-radius: 2px;
+}
+
+/* keyboard skip link — hidden until focused */
+.skip-link {
+  position: fixed;
+  top: 0.6rem;
+  left: 0.6rem;
+  z-index: 200;
+  padding: 0.55rem 0.95rem;
+  border-radius: 8px;
+  background: var(--teal);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  transform: translateY(-220%);
+  transition: transform 0.25s ease;
+}
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: none;
 }
 
 /* ---- WebGL canvas + fallback backdrop ---- */
@@ -159,8 +180,12 @@ button {
   background: var(--teal);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 0 10px var(--teal);
+}
+/* only inactive links animate on hover; the active underline is shown
+   immediately (no transition) so it doesn't slide in when the topbar reveals */
+.nav-link:not([data-active='true'])::after {
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .nav-link:hover {
   color: var(--ink);
@@ -249,6 +274,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  z-index: 20;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.5s;
@@ -444,17 +470,23 @@ button {
   font-size: 0.82rem;
   max-width: 38ch;
 }
-.svc:hover .svc-desc {
+.svc:hover .svc-desc,
+.svc:focus-visible .svc-desc {
   display: block;
 }
 .contact-email {
+  position: relative;
   font-family: var(--font-display);
   font-weight: 500;
   font-size: clamp(1.3rem, 3.5vw, 2.2rem);
   color: var(--ink);
-  border-bottom: 1px solid var(--hair-teal);
+  border-bottom: 2px solid var(--teal);
   padding-bottom: 4px;
   transition: color 0.3s, border-color 0.3s;
+}
+.contact-email::after {
+  content: ' ↗';
+  color: var(--teal);
 }
 .contact-email:hover {
   color: var(--teal);
@@ -742,6 +774,8 @@ button {
   button, a, .chatnav-input { cursor: pointer; }
   .chatnav-input { cursor: text; }
   .cursor-dot, .cursor-ring { display: none; }
+  /* no hover on touch — always show service descriptions */
+  .svc-desc { display: block; }
 }
 
 /* ---- responsive ---- */

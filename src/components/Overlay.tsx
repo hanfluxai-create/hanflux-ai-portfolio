@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { useStore, type Section } from '../store/store'
 import { BRAND, CAPABILITIES, ABOUT } from '../config/content'
 
@@ -23,6 +24,12 @@ export function Overlay() {
 
   const active = CAPABILITIES[activeIndex]
   const detail = selected != null ? CAPABILITIES[selected] : null
+  const closeRef = useRef<HTMLButtonElement>(null)
+
+  // move focus to the detail panel's close button when it opens
+  useEffect(() => {
+    if (detail) closeRef.current?.focus()
+  }, [detail])
 
   const openCard = (i: number) => {
     requestFlyTo('work')
@@ -31,12 +38,19 @@ export function Overlay() {
 
   return (
     <div className="overlay" data-section={section}>
+      <a href="#main-nav" className="skip-link">Skip to navigation</a>
       <header className="topbar">
-        <a href="#" className="wordmark" data-hover onClick={() => requestFlyTo('work')}>
+        <button
+          className="wordmark"
+          type="button"
+          data-hover
+          onClick={() => requestFlyTo('work')}
+          aria-label={`${BRAND.name} — go to Work`}
+        >
           {BRAND.wordmark}
           <span className="wordmark-mark">°</span>
-        </a>
-        <nav className="nav">
+        </button>
+        <nav className="nav" id="main-nav">
           {NAV.map((n) => (
             <button
               key={n.section}
@@ -69,7 +83,7 @@ export function Overlay() {
       <aside className="detail" data-active={!!detail} aria-hidden={!detail}>
         {detail && (
           <>
-            <button className="detail-close" onClick={() => setSelected(null)} data-hover>
+            <button ref={closeRef} className="detail-close" onClick={() => setSelected(null)} data-hover>
               close ✕
             </button>
             <span className="detail-kicker">
@@ -111,7 +125,7 @@ export function Overlay() {
         <ul className="svc-list">
           {CAPABILITIES.map((c, i) => (
             <li key={c.id}>
-              <button className="svc" onClick={() => openCard(i)} data-hover>
+              <button className="svc" onClick={() => openCard(i)} data-hover aria-label={`View ${c.title}`}>
                 <span className="svc-kicker">{c.kicker}</span>
                 <span className="svc-title">{c.title}</span>
                 <span className="svc-desc">{c.description}</span>

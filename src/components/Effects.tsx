@@ -19,7 +19,7 @@ export function Effects() {
   const t = CONFIG.tiers[quality]
 
   return (
-    <EffectComposer>
+    <EffectComposer key={quality}>
       {t.bloom ? (
         <Bloom
           intensity={CONFIG.bloom.intensity}

@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useFBO } from '@react-three/drei'
 import {
@@ -393,6 +393,22 @@ export function ParticleField() {
   // scratch vectors
   const mouseWorld = useMemo(() => new Vector3(), [])
 
+  // dispose all manually-created GPU resources on unmount (key={tier} remount)
+  useEffect(() => {
+    const fa = fboA
+    const fb = fboB
+    return () => {
+      seedTexture.dispose()
+      pointsGeometry.dispose()
+      sim.material.dispose()
+      sim.scene.traverse((o) => {
+        if (o instanceof Mesh) o.geometry.dispose()
+      })
+      fa.dispose()
+      fb.dispose()
+    }
+  }, [seedTexture, pointsGeometry, sim, fboA, fboB])
+
   /* -------------------------------------------------------------------------
    *  PRIORITY -1 : runs BEFORE the postprocessing EffectComposer (priority 1).
    *  Negative priority orders the callback first WITHOUT taking over the
@@ -450,6 +466,7 @@ export function ParticleField() {
       u.uTime.value = state.clock.elapsedTime
       u.uScroll.value = m.uScroll.value
       u.uSize.value = CONFIG.particles.size
+      u.uDpr.value = Math.min(viewport.dpr ?? 1, 2) // keep in sync with AdaptiveDpr
       u.uIntro.value = useStore.getState().intro
     }
   }, -1)
