@@ -1,30 +1,40 @@
-import { Suspense } from 'react'
-import { Canvas } from '@react-three/fiber'
-import { CONFIG } from './config/config'
-import { ParticleField } from './scene/ParticleField'
-import { Effects } from './components/Effects'
+import { lazy, Suspense, useEffect } from 'react'
+import { Overlay } from './components/Overlay'
 import { Cursor } from './components/Cursor'
 import { DebugPanel } from './components/DebugPanel'
-import { Overlay } from './components/Overlay'
+import { Preloader } from './components/Preloader'
+import { ChatNavigator } from './components/ChatNavigator'
+import { Fallback } from './components/Fallback'
+import { useWebGLSupported } from './hooks/useWebGLSupported'
+import { useIntro } from './intro/useIntro'
+import { useStore } from './store/store'
+
+// lazy so three/postprocessing fetch on Canvas mount, not on initial boot
+const Scene = lazy(() => import('./scene/Scene'))
 
 export default function App() {
+  const webgl = useWebGLSupported()
+  const setLoaded = useStore((s) => s.setLoaded)
+  useIntro()
+
+  // no WebGL -> no scene to load, so clear the preloader and show the fallback
+  useEffect(() => {
+    if (!webgl) setLoaded(true)
+  }, [webgl, setLoaded])
+
   return (
     <>
-      <Canvas
-        className="canvas"
-        dpr={[1, 2]}
-        gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
-        camera={{ position: CONFIG.camera.position, fov: CONFIG.camera.fov }}
-      >
-        <color attach="background" args={[CONFIG.colors.background]} />
-        <fog attach="fog" args={[CONFIG.colors.fog, CONFIG.fog.near, CONFIG.fog.far]} />
-        <Suspense fallback={null}>
-          <ParticleField />
+      {webgl ? (
+        <Suspense fallback={<Fallback />}>
+          <Scene />
         </Suspense>
-        <Effects />
-      </Canvas>
+      ) : (
+        <Fallback />
+      )}
 
+      <Preloader />
       <Overlay />
+      <ChatNavigator />
       <Cursor />
       <DebugPanel />
     </>

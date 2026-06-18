@@ -181,6 +181,7 @@ uniform float uSize;
 uniform float uTime;
 uniform float uScroll;
 uniform float uDpr;
+uniform float uIntro;      // 0 = cold/small, 1 = fully ignited (intro swell-in)
 
 attribute vec2 aRef;       // UV into the simulation texture
 attribute float aRand;     // per-particle 0..1 for variation / pink flares
@@ -202,7 +203,8 @@ void main(){
   // size attenuation (∝ 1/dist) + subtle twinkle + scroll-driven swell
   float twinkle = 0.7 + 0.3 * sin(uTime * 2.0 + aRand * 40.0);
   float swell = 1.0 + uScroll * 0.4;
-  gl_PointSize = uSize * uDpr * swell * twinkle * (300.0 / max(vDepth, 0.001));
+  // ignition: points grow from 55% -> 100% as the intro fires
+  gl_PointSize = uSize * uDpr * swell * twinkle * (0.55 + 0.45 * uIntro) * (300.0 / max(vDepth, 0.001));
 }
 `
 
@@ -216,6 +218,7 @@ uniform float uSparkChance;
 uniform float uFogNear;
 uniform float uFogFar;
 uniform vec3  uFogColor;
+uniform float uIntro;   // 0..1 ignition fade-in
 
 varying float vAge;
 varying float vRand;
@@ -243,6 +246,9 @@ void main(){
   col *= fog;
   alpha *= fog;
 
+  // ignition fade-in
+  alpha *= uIntro;
+
   gl_FragColor = vec4(col, alpha);
 }
 `
@@ -259,8 +265,10 @@ void main(){
 export function ParticleField() {
   const { gl, pointer, viewport } = useThree()
 
-  // ---- derive grid size from CONFIG count (square FBO) ----
-  const SIZE = useMemo(() => fboSizeFor(CONFIG.particles.count), [])
+  // ---- derive grid size from the live runtime count (square FBO) ----
+  // runtime.particleCount is set by the perf tier system before mount; a
+  // <ParticleField key={tier}/> remount rebuilds all buffers at a new count.
+  const SIZE = useMemo(() => fboSizeFor(CONFIG.runtime.particleCount), [])
   const COUNT = SIZE * SIZE
 
   // ---- ping-pong float render targets (explicit, fixed size = SIZE x SIZE) ----
@@ -375,6 +383,7 @@ export function ParticleField() {
       uFogNear: { value: CONFIG.fog.near },
       uFogFar: { value: CONFIG.fog.far },
       uFogColor: { value: new Color(CONFIG.colors.fog) },
+      uIntro: { value: 0 },
     }),
     // built once; values are mutated live in useFrame
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -394,6 +403,17 @@ export function ParticleField() {
     if (!seeded.current) {
       seedTargets()
       seeded.current = true
+    }
+
+    // Reduced-motion / on-demand: hold a single static frame, no advection.
+    if (CONFIG.runtime.reducedMotion) {
+      if (renderMatRef.current) {
+        const u = renderMatRef.current.uniforms
+        u.uPosition.value = read.current.texture
+        u.uIntro.value = useStore.getState().intro
+        u.uSize.value = CONFIG.particles.size
+      }
+      return
     }
 
     const dt = Math.min(delta, 1 / 30) // clamp to avoid blow-ups on tab refocus
@@ -430,6 +450,7 @@ export function ParticleField() {
       u.uTime.value = state.clock.elapsedTime
       u.uScroll.value = m.uScroll.value
       u.uSize.value = CONFIG.particles.size
+      u.uIntro.value = useStore.getState().intro
     }
   }, -1)
 

@@ -1,73 +1,55 @@
-# React + TypeScript + Vite
+# Hanflux AI — Immersive WebGL Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An award-style, real-time WebGL experience for **Hanflux AI** — the ultimate workflow
+automation & AI voice-agent ecosystem. Dark "DEEP SIGNAL" aesthetic: an abyssal
+obsidian void, bioluminescent teal→ultraviolet neon, GPU particles, an AI-chat
+navigator, and a 3D capability carousel with particle-dissolve transitions.
 
-Currently, two official plugins are available:
+> Visual north star: the real-time-3D feel of studios like Active Theory & Lusion.
+> All brand, copy, and content are original to Hanflux AI.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Stack
 
-## React Compiler
+| Layer | Tech |
+|---|---|
+| Build | Vite 8 · React 19 · TypeScript 6 |
+| 3D | three 0.184 · @react-three/fiber · drei · @react-three/postprocessing |
+| Animation | GSAP 3 (ScrollTrigger + SplitText, now free) |
+| Scroll / State | Lenis · Zustand |
+| Debug | Tweakpane (press **G**) |
+| Chat (optional LLM) | Vercel AI SDK + @ai-sdk/anthropic |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Develop
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev      # http://localhost:5173
+npm run build    # production build
+npm run preview  # preview the build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Press **G** in dev to open the Tweakpane debug panel.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Where things live
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- `src/config/config.ts` — every 3D/visual tunable (colors, particles, bloom, camera). Tweakpane binds to it live.
+- `src/config/content.ts` — all brand copy, capabilities, about, chat chips. **Edit here to rebrand / add real projects + images.**
+- `src/scene/` — R3F scene (particle field, carousel).
+- `src/components/` — DOM overlay, cursor, chat, debug, post-processing.
+- `src/shaders/` — GLSL for the particle field and dissolve transitions.
+
+## Chat navigator
+
+Works fully offline via local keyword matching. To enable optional LLM
+free-text interpretation, copy `.env.example` → `.env` and set the flag + key
+(see the security note in that file).
+
+## Build phases
+
+0. Scaffold + post-processing + cursor + debug ✅
+1. Preloader + GSAP intro (real load progress)
+2. GPGPU particle backdrop (mouse/scroll reactive)
+3. AI-chat navigator (keyword-first, LLM optional)
+4. 3D capability carousel + particle-dissolve transitions
+5. DOM overlay / SplitText reveals / About + Contact
+6. Perf-tiering · mobile · reduced-motion · WebGL fallback
