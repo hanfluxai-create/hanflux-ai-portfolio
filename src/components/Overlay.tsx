@@ -1,3 +1,5 @@
+import { BRAND } from '../config/content'
+
 /**
  * Minimal DOM overlay for Phase 0: wordmark + nav + a corner HUD.
  * Phase 5 grows this into full SplitText reveals and active states.
@@ -7,7 +9,8 @@ export function Overlay() {
     <div className="overlay">
       <header className="topbar">
         <a href="#" className="wordmark" data-hover>
-          HYDRA<span className="wordmark-mark">°</span>
+          {BRAND.wordmark}
+          <span className="wordmark-mark">°</span>
         </a>
         <nav className="nav">
           <a href="#work" data-hover>Work</a>
