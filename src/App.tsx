@@ -12,6 +12,11 @@ import { useStore } from './store/store'
 const Scene = lazy(() => import('./scene/Scene'))
 // lazy so GSAP + SplitText + ScrollTrigger stream off the critical path
 const IntroController = lazy(() => import('./intro/IntroController'))
+// Act II — the vertical "Descent" world below the hero. Lazy: keeps GSAP + Lenis
+// + the glass-gallery canvas off the initial Act I boot path. Additive only.
+const DownwardWorld = lazy(() =>
+  import('./act2/DownwardWorld').then((m) => ({ default: m.DownwardWorld })),
+)
 
 export default function App() {
   const webgl = useWebGLSupported()
@@ -43,6 +48,11 @@ export default function App() {
       <ChatNavigator />
       <Cursor />
       <DebugPanel />
+
+      {/* Act II — built around Act I, scrolls downward from it. Never mutates Act I. */}
+      <Suspense fallback={null}>
+        <DownwardWorld webgl={webgl} />
+      </Suspense>
     </>
   )
 }
