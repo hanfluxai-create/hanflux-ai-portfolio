@@ -31,8 +31,8 @@ function Tunnel() {
     const m = mat.current
     if (!m) return
     const isReduced = reduced()
-    // reduced-motion: freeze the rushing tunnel; show a static open portal
-    if (!isReduced) m.uTime += dt
+    // tunnel always animates so the finale is alive on every device
+    m.uTime += dt
     m.uAspect = size.width / size.height
     m.uPointer.set(scrollState.pointerX, scrollState.pointerY)
     if (isReduced) {

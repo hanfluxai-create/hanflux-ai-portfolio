@@ -26,6 +26,11 @@ export function Dive() {
   const words = useRef<(HTMLSpanElement | null)[]>([])
   const duration = useRef(5)
   const [src, setSrc] = useState<string | null>(null)
+  // phones can't reliably scrub a PAUSED <video> (iOS only renders frames after a
+  // gesture-driven play) → autoplay the muted loop inline instead of scrubbing.
+  const isMobile =
+    typeof window !== 'undefined' &&
+    (window.innerWidth < 760 || matchMedia('(hover: none)').matches)
 
   // load the clip only when the dive is near view (don't pay for it up top)
   useEffect(() => {
@@ -43,6 +48,19 @@ export function Dive() {
     io.observe(el)
     return () => io.disconnect()
   }, [])
+
+  // mobile: play the muted loop inline once the source is in (no scrubbing)
+  useEffect(() => {
+    const vid = video.current
+    if (!vid || !src || !isMobile) return
+    vid.loop = true
+    const tryPlay = () => {
+      vid.play().catch(() => {})
+    }
+    tryPlay()
+    vid.addEventListener('canplay', tryPlay, { once: true })
+    return () => vid.removeEventListener('canplay', tryPlay)
+  }, [src, isMobile])
 
   // scrub the video + drive the kinetic dive from scroll
   useEffect(() => {
@@ -63,8 +81,8 @@ export function Dive() {
       scrub: true,
       onUpdate: (self) => {
         const p = self.progress
-        // scrub the footage (paused video, seek by scroll)
-        if (vid.readyState >= 1) {
+        // desktop scrubs the paused footage by scroll; mobile autoplays the loop
+        if (!isMobile && vid.readyState >= 1) {
           const t = Math.min(duration.current - 0.05, p * duration.current)
           if (Math.abs(vid.currentTime - t) > 0.01) vid.currentTime = t
         }
@@ -106,6 +124,8 @@ export function Dive() {
           poster={D.poster}
           muted
           playsInline
+          loop={isMobile}
+          autoPlay={isMobile}
           preload="auto"
           aria-hidden="true"
         />

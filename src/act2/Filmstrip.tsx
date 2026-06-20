@@ -62,8 +62,9 @@ function FlowPlane() {
     cur.current.b.lerp(tgt.b, k)
     cur.current.c.lerp(tgt.c, k)
 
-    // reduced-motion: freeze the flowing noise (CSS media query can't reach WebGL)
-    if (!isReduced) m.uTime += dt
+    // ambient flow always animates — gentle background motion reads as "alive" on
+    // every device (incl. phones with Reduce Motion on); big motions still snap below
+    m.uTime += dt
     m.uColorA.copy(cur.current.a)
     m.uColorB.copy(cur.current.b)
     m.uColorC.copy(cur.current.c)

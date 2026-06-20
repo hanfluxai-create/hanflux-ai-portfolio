@@ -58,8 +58,8 @@ function TileMesh({
     const m = mat.current
     if (!m) return
     const isReduced = reduced()
-    // reduced-motion: freeze the shader's breathing/scanline animation
-    if (!isReduced) m.uTime += dt
+    // ambient breathing/scanline always animates (alive on every device)
+    m.uTime += dt
     targetHover.current = isActive ? 1 : 0
     m.uHover = isReduced ? targetHover.current : MathUtils.damp(m.uHover, targetHover.current, 9, dt)
     m.uPointer.lerp(pointer.current, isReduced ? 1 : 0.2)
@@ -91,6 +91,10 @@ function TileMesh({
       }}
       onPointerMove={onMove}
       onPointerOut={() => onActivate(null)}
+      onClick={(e) => {
+        e.stopPropagation()
+        onActivate(project.id)
+      }}
     >
       <planeGeometry args={[size[0], size[1], 1, 1]} />
       <imageDistortMaterial ref={mat} transparent depthWrite={false} />
@@ -115,18 +119,30 @@ function Grid({
   activeId: string | null
   onActivate: (id: string | null) => void
 }) {
-  const { viewport } = useThree()
-  const cols = viewport.width < 6 ? 1 : viewport.width < 9 ? 2 : 3
+  const { viewport, size } = useThree()
+  // phones force 2 columns; desktop keeps the original world-width logic untouched
+  const isPhone = size.width < 620
+  const cols = isPhone ? 2 : viewport.width < 6 ? 1 : viewport.width < 9 ? 2 : 3
   const rows = Math.ceil(PROJECTS.length / cols)
-  const gap = viewport.width * 0.025
-  const tileW = (viewport.width * 0.9 - gap * (cols - 1)) / cols
-  const tileH = tileW / 1.5
-  const totalH = tileH * rows + gap * (rows - 1)
+  let gap = viewport.width * 0.025
+  let tileW = (viewport.width * 0.9 - gap * (cols - 1)) / cols
+  let tileH = tileW / 1.5
+  let totalH = tileH * rows + gap * (rows - 1)
+  // scale the whole grid down if it's taller than the view (portrait / 3 rows)
+  const maxH = viewport.height * 0.9
+  if (totalH > maxH) {
+    const k = maxH / totalH
+    tileW *= k
+    tileH *= k
+    gap *= k
+    totalH = maxH
+  }
+  const fieldW = tileW * cols + gap * (cols - 1)
 
   const layout = PROJECTS.map((_, i) => {
     const c = i % cols
     const r = Math.floor(i / cols)
-    const x = -(viewport.width * 0.9) / 2 + tileW / 2 + c * (tileW + gap)
+    const x = -fieldW / 2 + tileW / 2 + c * (tileW + gap)
     const y = totalH / 2 - tileH / 2 - r * (tileH + gap)
     return { x, y }
   })

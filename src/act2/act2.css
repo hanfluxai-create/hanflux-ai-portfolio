@@ -1248,24 +1248,56 @@ body.in-act2 .ascend {
 
 /* ============================ responsive (Act II/III) =================== */
 @media (max-width: 860px) {
-  .reel-stage {
-    grid-template-columns: 1fr;
-  }
+  /* keep the work-reel 3D on phones — full-width canvas, tappable legend + detail
+     stacked beneath it (the canvas hosts the same shader tiles as desktop). */
   .reel-canvas {
-    display: none; /* heavy tile canvas is a desktop spectacle */
+    min-height: 54vh;
+    touch-action: pan-y; /* tap activates a tile; vertical swipe still scrolls */
   }
   .reel-ui {
-    display: none; /* detail+legend drive the hidden canvas; fallback grid carries content on mobile */
+    grid-template-columns: 1fr;
+    gap: 1.3rem;
+    margin-top: 1.4rem;
   }
-  .reel-fallback {
-    display: grid;
+  .reel-legend {
+    order: 1; /* chips first: tap to drive the tile above */
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    border-top: none;
   }
+  .reel-detail {
+    order: 2;
+  }
+  .rl {
+    width: auto;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--hair);
+    border-radius: 999px;
+  }
+  .rl:hover,
+  .rl:focus-visible,
+  .rl[data-on='true'] {
+    padding-left: 0.9rem;
+    border-color: var(--hair-teal);
+  }
+  .rl-title {
+    font-size: 0.92rem;
+  }
+  .rd-title {
+    font-size: clamp(1.8rem, 7vw, 2.6rem);
+  }
+
+  /* filmstrip mobile */
   .film-numeral {
     top: 4vh;
     font-size: clamp(7rem, 40vw, 16rem);
   }
   .film-panel {
-    padding-bottom: 22vh;
+    padding-bottom: 26vh;
+  }
+  .film-index {
+    width: min(88vw, 24rem);
   }
 }
 
