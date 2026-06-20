@@ -9,4 +9,5 @@ export const scrollState = {
   pointerX: 0, // -1..1 normalized pointer, for parallax
   pointerY: 0,
   active: -1, // index of the focused capability card (-1 = none)
+  portalProgress: 0, // 0..1 how "open" the Act III portal is (scroll-driven)
 }

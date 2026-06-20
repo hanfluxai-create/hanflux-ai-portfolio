@@ -1,27 +1,32 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import Lenis from 'lenis'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ACT2 } from './content2'
 import { scrollState } from './scrollState'
-import { GlassGallery } from './GlassGallery'
+import { useStore } from '../store/store'
+import { Filmstrip } from './Filmstrip'
+import { Dive } from './Dive'
+import { WorkReel } from './WorkReel'
+import { Portal } from './Portal'
+import { SplitReveal, useStaggerReveal } from './kinetic'
 import './act2.css'
 
 gsap.registerPlugin(ScrollTrigger)
 
 /**
- * ACT II — "The Descent". Lives vertically BELOW the Act I immersive hero.
- * Purely additive: Act I (the fixed WebGL experience) is never modified. A
- * Lenis smooth-scroller drives the document; it is told to IGNORE wheel/touch
- * over Act I's `.canvas`, so Act I's carousel keeps its own wheel behaviour.
- * Crossing the first viewport adds `body.in-act2`, which fades Act I back.
+ * ACT II + III — "The Descent". Lives vertically BELOW the Act I immersive hero.
+ * Purely additive: Act I (the fixed WebGL experience) is never modified. A Lenis
+ * smooth-scroller drives the document; it is told to IGNORE wheel/touch over Act
+ * I's `.canvas`, so Act I's carousel keeps its own wheel. Crossing the first
+ * viewport adds `body.in-act2`, which fades Act I back to a living backdrop.
+ *
+ * Act II = the kinetic capability Filmstrip + the living-loop / stack / metrics.
+ * Act III = the "Signals Shipped" WorkReel + the Portal finale.
  */
 export function DownwardWorld({ webgl = true }: { webgl?: boolean }) {
-  const [galleryLive, setGalleryLive] = useState(false)
-  const [active, setActive] = useState(0)
   const lenisRef = useRef<Lenis | null>(null)
-  const gallerySection = useRef<HTMLElement>(null)
-  const stage = useRef<HTMLDivElement>(null)
+  const scope = useRef<HTMLDivElement>(null)
 
   // --- Lenis smooth scroll + GSAP ScrollTrigger sync -----------------------
   useEffect(() => {
@@ -63,41 +68,7 @@ export function DownwardWorld({ webgl = true }: { webgl?: boolean }) {
     }
   }, [])
 
-  // --- drive the glass gallery from scroll + reveal sections ----------------
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      if (gallerySection.current) {
-        ScrollTrigger.create({
-          trigger: gallerySection.current,
-          start: 'top top',
-          end: 'bottom bottom',
-          scrub: true,
-          onUpdate: (self) => {
-            scrollState.galleryProgress = self.progress
-            const i = Math.round(self.progress * (ACT2.capabilities.length - 1))
-            setActive((prev) => (prev === i ? prev : i))
-          },
-        })
-      }
-      // cheap, robust reveals
-      gsap.utils.toArray<HTMLElement>('.reveal').forEach((el) => {
-        gsap.fromTo(
-          el,
-          { y: 40, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.9,
-            ease: 'power3.out',
-            scrollTrigger: { trigger: el, start: 'top 82%', once: true },
-          },
-        )
-      })
-    })
-    return () => ctx.revert()
-  }, [])
-
-  // --- pointer parallax feed for the 3D ------------------------------------
+  // --- pointer parallax feed for all the 3D --------------------------------
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
       scrollState.pointerX = (e.clientX / window.innerWidth) * 2 - 1
@@ -107,26 +78,33 @@ export function DownwardWorld({ webgl = true }: { webgl?: boolean }) {
     return () => window.removeEventListener('pointermove', onMove)
   }, [])
 
-  // --- mount the heavy canvas only while the gallery is near the viewport ---
+  // --- boot failsafe -------------------------------------------------------
+  // Act I clears its preloader from inside the intro, which only fires once
+  // three's GLOBAL loading manager reports done (drei useProgress). If that ever
+  // edge-cases out (manager state never settles on a given browser), the site
+  // would hang on the preloader. This additive net forces the ignited/loaded
+  // state after a grace period so boot can never get stuck. No Act I files touched.
   useEffect(() => {
-    const el = gallerySection.current
-    if (!el) return
-    const io = new IntersectionObserver(
-      ([e]) => setGalleryLive(webgl && e.isIntersecting),
-      { rootMargin: '40% 0px 40% 0px' },
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [webgl])
+    const t = window.setTimeout(() => {
+      const s = useStore.getState()
+      if (!s.loaded) {
+        s.setIntro(1)
+        s.setSection('work')
+        s.setLoaded(true)
+      }
+    }, 7000)
+    return () => window.clearTimeout(t)
+  }, [])
+
+  // --- stagger-reveal the supporting (non-canvas) blocks -------------------
+  useStaggerReveal(scope, '.kreveal')
 
   const descend = () => lenisRef.current?.scrollTo('#descent', { duration: 1.6 })
   const ascend = () => lenisRef.current?.scrollTo(0, { duration: 1.6 })
 
-  const cap = ACT2.capabilities[active]
-
   return (
-    <div className="act2-root">
-      {/* drifting colour aurora — fixed, lives behind every Act II section */}
+    <div className="act2-root" ref={scope}>
+      {/* drifting colour aurora — fixed, lives behind every Act II/III section */}
       <div className="act2-aurora" aria-hidden="true" />
 
       {/* first viewport: Act I shows through; only the descend cue is clickable */}
@@ -146,75 +124,27 @@ export function DownwardWorld({ webgl = true }: { webgl?: boolean }) {
       <main className="act2">
         {/* ---- THRESHOLD ---- */}
         <section className="a2 threshold" id="descent">
-          <p className="kicker reveal">{ACT2.threshold.kicker}</p>
-          <h2 className="display reveal">
-            {ACT2.threshold.title.map((l, i) => (
-              <span key={i} className="display-line">
-                {l}
-              </span>
-            ))}
-          </h2>
-          <p className="lede reveal">{ACT2.threshold.sub}</p>
+          <p className="kicker kreveal">{ACT2.threshold.kicker}</p>
+          <SplitReveal as="h2" className="k-head k-xl" start="top 85%">
+            {ACT2.threshold.title.join(' ')}
+          </SplitReveal>
+          <p className="lede kreveal">{ACT2.threshold.sub}</p>
         </section>
 
-        {/* ---- ARSENAL / GLASS GALLERY (tall, sticky stage) ---- */}
-        <section className="a2 arsenal" ref={gallerySection}>
-          <div className="gallery-stage" ref={stage}>
-            <div className="gallery-canvas">{galleryLive && <GlassGallery />}</div>
-
-            <div className="gallery-ui">
-              <div className="gallery-head reveal">
-                <p className="kicker">{ACT2.arsenal.kicker}</p>
-                <h2 className="display sm">{ACT2.arsenal.title}</h2>
-              </div>
-
-              <div className="gallery-active" key={cap.id}>
-                <span className="ga-no">{cap.no}</span>
-                <span className="ga-tag">{cap.tag}</span>
-                <h3 className="ga-title">{cap.title}</h3>
-                <p className="ga-blurb">{cap.blurb}</p>
-                <ul className="ga-bullets">
-                  {cap.bullets.map((b) => (
-                    <li key={b}>{b}</li>
-                  ))}
-                </ul>
-              </div>
-
-              <ol className="gallery-legend" aria-label="capabilities">
-                {ACT2.capabilities.map((c, i) => (
-                  <li key={c.id}>
-                    <button
-                      className="leg"
-                      data-on={i === active}
-                      data-hover
-                      onClick={() =>
-                        lenisRef.current?.scrollTo(gallerySection.current!, {
-                          offset:
-                            (gallerySection.current!.offsetHeight - window.innerHeight) *
-                            (i / (ACT2.capabilities.length - 1)),
-                          duration: 1.1,
-                        })
-                      }
-                    >
-                      <span className="leg-no">{c.no}</span>
-                      <span className="leg-title">{c.title}</span>
-                    </button>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </div>
-        </section>
+        {/* ---- ACT II · KINETIC CAPABILITY FILMSTRIP ---- */}
+        <Filmstrip webgl={webgl} />
 
         {/* ---- THE LIVING LOOP ---- */}
         <section className="a2 loop">
-          <div className="loop-head reveal">
-            <p className="kicker">{ACT2.loop.kicker}</p>
-            <h2 className="display sm">{ACT2.loop.title}</h2>
+          <div className="loop-head">
+            <p className="kicker kreveal">{ACT2.loop.kicker}</p>
+            <SplitReveal as="h2" className="k-head k-sm">
+              {ACT2.loop.title}
+            </SplitReveal>
           </div>
           <div className="loop-grid">
             {ACT2.loop.steps.map((s) => (
-              <article className="loop-step glass reveal" key={s.no}>
+              <article className="loop-step glass kreveal" key={s.no}>
                 <span className="ls-no">{s.no}</span>
                 <h3 className="ls-title">{s.title}</h3>
                 <p className="ls-body">{s.body}</p>
@@ -225,13 +155,15 @@ export function DownwardWorld({ webgl = true }: { webgl?: boolean }) {
 
         {/* ---- THE STACK ---- */}
         <section className="a2 stack">
-          <div className="stack-head reveal">
-            <p className="kicker">{ACT2.stack.kicker}</p>
-            <h2 className="display sm">{ACT2.stack.title}</h2>
+          <div className="stack-head">
+            <p className="kicker kreveal">{ACT2.stack.kicker}</p>
+            <SplitReveal as="h2" className="k-head k-sm">
+              {ACT2.stack.title}
+            </SplitReveal>
           </div>
           <div className="stack-grid">
             {ACT2.stack.groups.map((g) => (
-              <div className="stack-group reveal" key={g.label}>
+              <div className="stack-group kreveal" key={g.label}>
                 <span className="sg-label">{g.label}</span>
                 <ul className="sg-items">
                   {g.items.map((it) => (
@@ -247,7 +179,7 @@ export function DownwardWorld({ webgl = true }: { webgl?: boolean }) {
         <section className="a2 metrics">
           <div className="metrics-row">
             {ACT2.metrics.map((m) => (
-              <div className="metric reveal" key={m.l}>
+              <div className="metric kreveal" key={m.l}>
                 <span className="m-v">{m.v}</span>
                 <span className="m-l">{m.l}</span>
               </div>
@@ -255,31 +187,15 @@ export function DownwardWorld({ webgl = true }: { webgl?: boolean }) {
           </div>
         </section>
 
-        {/* ---- CTA ---- */}
-        <section className="a2 cta">
-          <p className="kicker reveal">{ACT2.cta.kicker}</p>
-          <h2 className="display reveal">
-            {ACT2.cta.title.map((l, i) => (
-              <span key={i} className="display-line">
-                {l}
-              </span>
-            ))}
-          </h2>
-          <p className="lede reveal">{ACT2.cta.body}</p>
-          <a className="cta-btn glass reveal" href={`mailto:${ACT2.cta.email}`} data-hover>
-            {ACT2.cta.button}
-            <span className="cta-arrow" />
-          </a>
-          <a className="cta-email reveal" href={`mailto:${ACT2.cta.email}`} data-hover>
-            {ACT2.cta.email}
-          </a>
-        </section>
+        {/* ---- THE DIVE · scroll-scrubbed Seedance plunge into the screen ---- */}
+        <Dive />
 
-        <footer className="a2-foot">
-          <span>Hanflux AI</span>
-          <span>the autonomous layer</span>
-        </footer>
+        {/* ---- ACT III · SIGNALS SHIPPED (work reel) ---- */}
+        <WorkReel webgl={webgl} />
       </main>
+
+      {/* ---- ACT III · THE PORTAL (finale + footer) ---- */}
+      <Portal webgl={webgl} />
     </div>
   )
 }

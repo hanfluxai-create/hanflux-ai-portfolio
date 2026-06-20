@@ -226,7 +226,7 @@ body.in-act2 .ascend {
   max-width: 46ch;
   font-size: clamp(1rem, 1.5vw, 1.4rem);
   line-height: 1.55;
-  color: var(--ink-dim);
+  color: #b3bbcf; /* ~5.4:1 over the dark scrim+aurora — clears WCAG AA */
 }
 
 /* reusable glass surface */
@@ -401,7 +401,9 @@ body.in-act2 .ascend {
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.45s ease, box-shadow 0.45s ease;
+  /* elastic overshoot on lift; glow eases in slightly ahead ("light lands first") */
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.4s ease,
+    box-shadow 0.35s cubic-bezier(0.2, 1, 0.3, 1);
 }
 /* iridescent top edge */
 .loop-step::after {
@@ -639,4 +641,635 @@ body.in-act2 .ascend {
   .descend-arrow::after {
     animation: none;
   }
+}
+
+/* ████████████████████████████████████████████████████████████████████████
+   ACT II/III — Active-Theory-caliber rebuild: kinetic type, the capability
+   filmstrip, the work reel, the portal finale. All additive; Act I untouched.
+   ████████████████████████████████████████████████████████████████████████ */
+
+/* ============================ kinetic typography ========================= */
+.kreveal { opacity: 0; }
+.kreveal-instant { opacity: 1; }
+/* SplitText wrappers: line = mask, char = the moving glyph */
+.kline { overflow: hidden; padding-bottom: 0.05em; }
+.kchar { display: inline-block; will-change: transform, opacity; }
+
+.k-head {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 0.92;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  overflow-wrap: break-word;
+  text-wrap: balance;
+  /* solid fill (NOT background-clip gradient — that drops glyphs once split) */
+  text-shadow: 0 0 60px rgba(39, 242, 192, 0.18);
+}
+.k-head.k-xl { font-size: clamp(3rem, 9vw, 8.5rem); }
+.k-head.k-sm { font-size: clamp(1.9rem, 4.4vw, 3.6rem); line-height: 0.98; letter-spacing: -0.02em; }
+
+/* ============================ FILMSTRIP (Act II) ========================= */
+.filmstrip {
+  position: relative;
+  height: 540vh; /* horizontal scrub distance for the 6 capability panels */
+  z-index: 1;
+}
+.film-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+.film-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+/* a soft dark scrim so type stays legible over the colour field */
+.film-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(70% 80% at 20% 75%, rgba(5, 6, 10, 0.82), transparent 62%),
+    radial-gradient(120% 120% at 50% 45%, transparent 35%, rgba(5, 6, 10, 0.55) 100%),
+    linear-gradient(180deg, rgba(5, 6, 10, 0.5), transparent 28%, rgba(5, 6, 10, 0.6));
+  box-shadow: inset 0 0 200px 50px rgba(5, 6, 10, 0.55);
+}
+.film-track {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+.film-panel {
+  position: relative;
+  flex: 0 0 100vw;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(1.6rem, 7vw, 9rem);
+  padding-bottom: 18vh;
+}
+.film-numeral {
+  position: absolute;
+  top: 6vh;
+  right: 3vw;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(9rem, 32vw, 28rem);
+  line-height: 0.7;
+  letter-spacing: -0.05em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(238, 240, 246, 0.16);
+  transform: translateX(calc(var(--off, 0) * 7vw));
+  opacity: calc(0.18 + var(--foc, 0) * 0.6);
+  pointer-events: none;
+}
+.film-copy {
+  position: relative;
+  max-width: 42rem;
+  transform: translateX(calc(var(--off, 0) * -3.5vw));
+  opacity: calc(0.05 + var(--foc, 0) * 0.95);
+}
+.film-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 1.2rem;
+}
+.film-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: clamp(2.6rem, 7vw, 6rem);
+  line-height: 0.94;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin-bottom: 1.4rem;
+  text-shadow: 0 6px 60px rgba(0, 0, 0, 0.6);
+}
+.film-blurb {
+  max-width: 40ch;
+  font-size: clamp(1rem, 1.4vw, 1.35rem);
+  line-height: 1.55;
+  color: var(--ink);
+  opacity: 0.92;
+}
+.film-bullets {
+  list-style: none;
+  margin-top: 1.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+.film-bullets li {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(6px);
+}
+.film-index {
+  position: absolute;
+  left: clamp(1.6rem, 7vw, 9rem);
+  bottom: clamp(2rem, 7vh, 5rem);
+  z-index: 3;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 0.4rem 1rem;
+  width: min(80vw, 30rem);
+}
+.film-index-no {
+  grid-row: 1 / 3;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 2.2rem;
+  color: var(--teal);
+  text-shadow: 0 0 22px rgba(39, 242, 192, 0.5);
+}
+.film-index-no i {
+  font-style: normal;
+  font-size: 0.9rem;
+  color: var(--ink-faint);
+  margin-left: 0.2rem;
+}
+.film-rail {
+  height: 2px;
+  background: var(--hair);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.film-rail-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal), var(--violet));
+  box-shadow: 0 0 10px var(--teal);
+  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.film-index-label {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+/* ============================ WORK REEL (Act III) ======================== */
+.reel {
+  position: relative;
+  z-index: 1;
+  padding: clamp(6rem, 14vh, 12rem) clamp(1.4rem, 6vw, 7rem);
+  max-width: 1640px;
+  margin: 0 auto;
+}
+.reel-head {
+  max-width: 34ch;
+  margin-bottom: clamp(2.5rem, 6vw, 5rem);
+}
+.reel-head .lede {
+  max-width: 52ch;
+}
+.reel-stage {
+  position: relative;
+}
+.reel-canvas {
+  position: relative;
+  width: 100%;
+  min-height: 68vh;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--hair);
+  background: radial-gradient(120% 120% at 50% 50%, rgba(124, 92, 255, 0.06), transparent 70%);
+}
+.reel-ui {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr minmax(260px, 22rem);
+  gap: clamp(1.5rem, 3vw, 3rem);
+  align-items: start;
+  margin-top: clamp(1.6rem, 3vw, 2.6rem);
+}
+.reel-detail {
+  animation: ga-in 0.5s ease both;
+}
+.rd-no {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--teal);
+}
+.rd-sector {
+  display: inline-block;
+  margin-left: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.rd-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  margin: 0.7rem 0 1rem;
+  color: var(--ink);
+}
+.rd-blurb {
+  color: var(--ink-dim);
+  font-size: clamp(0.95rem, 1.15vw, 1.1rem);
+  line-height: 1.6;
+  max-width: 36ch;
+}
+.rd-metric {
+  display: inline-block;
+  margin-top: 1.2rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.3rem;
+  background: linear-gradient(100deg, var(--teal), var(--violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.rd-tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.4rem;
+}
+.rd-tags li {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+}
+.reel-legend {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  border-top: 1px solid var(--hair);
+}
+.rl {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  width: 100%;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--hair);
+  color: var(--ink-faint);
+  text-align: left;
+  transition: color 0.3s ease, padding-left 0.3s ease;
+}
+.rl-no {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  opacity: 0.7;
+}
+.rl-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.15rem;
+}
+.rl:hover,
+.rl:focus-visible {
+  color: var(--teal);
+  padding-left: 0.6rem;
+  outline: none;
+}
+.rl[data-on='true'] {
+  color: var(--ink);
+  padding-left: 0.6rem;
+}
+.rl[data-on='true'] .rl-title {
+  text-shadow: 0 0 18px rgba(39, 242, 192, 0.45);
+}
+/* mobile / no-webgl fallback grid of cards */
+.reel-fallback {
+  display: none;
+  list-style: none;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  grid-column: 1 / -1;
+}
+.reel-fallback li {
+  padding: 1.4rem;
+  border-radius: 16px;
+  border: 1px solid var(--hair);
+  border-top: 2px solid var(--a, var(--teal));
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+}
+.reel-fallback .rf-no {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--teal);
+}
+.reel-fallback h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0.4rem 0 0.6rem;
+}
+.reel-fallback p {
+  color: var(--ink-dim);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.reel.no-webgl .reel-canvas { display: none; }
+.reel.no-webgl .reel-fallback { display: grid; }
+
+/* ============================ THE DIVE (scroll-scrubbed video) ========== */
+.dive {
+  position: relative;
+  z-index: 1;
+  height: 380vh; /* scrub distance for the plunge */
+}
+.dive-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg);
+}
+.dive-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(var(--vid-scale, 1));
+  transform-origin: center 46%;
+  will-change: transform;
+}
+.dive-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 46%,
+    transparent 28%,
+    rgba(5, 6, 10, var(--dive-vig, 0.4)) 100%
+  );
+  box-shadow: inset 0 0 220px 50px rgba(5, 6, 10, 0.7);
+}
+.dive-words {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  perspective: 800px;
+}
+.dive-word {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%) scale(0.2);
+  opacity: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: clamp(2.6rem, 9vw, 9rem);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--ink);
+  white-space: nowrap;
+  text-shadow: 0 0 70px rgba(39, 242, 192, 0.45), 0 0 30px rgba(124, 92, 255, 0.4);
+  will-change: transform, opacity, filter;
+}
+.dive-hud {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(2rem, 7vh, 5rem);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  text-align: center;
+  z-index: 3;
+}
+.dive-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--teal);
+  text-shadow: 0 0 16px rgba(39, 242, 192, 0.5);
+}
+.dive-sub {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  color: var(--ink-faint);
+}
+@media (prefers-reduced-motion: reduce) {
+  .dive {
+    height: 130vh;
+  }
+  .dive-words {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0 0.35em;
+    padding: 0 8vw;
+    perspective: none;
+  }
+  .dive-word {
+    position: static;
+    transform: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    font-size: clamp(2rem, 7vw, 5rem);
+  }
+}
+
+/* ============================ PORTAL (Act III finale) =================== */
+.portal {
+  position: relative;
+  z-index: 12;
+  min-height: 112vh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.portal-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.portal-fallback {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(45% 45% at 50% 50%, rgba(39, 242, 192, 0.3), transparent 60%),
+    radial-gradient(70% 70% at 50% 50%, rgba(124, 92, 255, 0.22), transparent 65%),
+    var(--bg);
+}
+.portal-ui {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.3rem;
+  padding: clamp(2rem, 6vw, 5rem);
+  max-width: 62rem;
+}
+.portal .kicker {
+  margin-bottom: 0.4rem;
+}
+.portal-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: clamp(2.6rem, 8vw, 7rem);
+  line-height: 0.94;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  text-shadow: 0 0 80px rgba(39, 242, 192, 0.35);
+  opacity: 0;
+}
+.portal-body {
+  max-width: 46ch;
+  font-size: clamp(1rem, 1.4vw, 1.3rem);
+  line-height: 1.6;
+  color: var(--ink);
+  opacity: 0.9;
+}
+.portal-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+  padding: 1.2rem 2.6rem;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--bg);
+  background: linear-gradient(100deg, var(--teal), #5ce0ff 55%, var(--violet));
+  box-shadow: 0 18px 60px rgba(39, 242, 192, 0.4);
+  transition: box-shadow 0.4s ease;
+  isolation: isolate;
+}
+.portal-cta:hover {
+  box-shadow: 0 26px 80px rgba(124, 92, 255, 0.55);
+}
+.portal-cta-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 999px;
+  border: 1px solid rgba(39, 242, 192, 0.5);
+  z-index: -1;
+  animation: portal-ring 2.8s ease-out infinite;
+}
+@keyframes portal-ring {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+.portal-email {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  color: var(--ink);
+  opacity: 0.85;
+  border-bottom: 1px solid var(--hair-teal);
+  padding-bottom: 2px;
+  transition: color 0.3s ease;
+}
+.portal-email:hover { color: var(--teal); }
+.portal-socials {
+  list-style: none;
+  display: flex;
+  gap: 1.6rem;
+  margin-top: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.portal-socials a {
+  color: var(--ink-dim);
+  transition: color 0.3s ease;
+}
+.portal-socials a:hover { color: var(--teal); }
+.portal-foot {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1.6rem clamp(1.4rem, 6vw, 7rem) 2rem;
+  border-top: 1px solid var(--hair);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  background: linear-gradient(0deg, rgba(5, 6, 10, 0.7), transparent);
+}
+
+/* ============================ responsive (Act II/III) =================== */
+@media (max-width: 860px) {
+  .reel-stage {
+    grid-template-columns: 1fr;
+  }
+  .reel-canvas {
+    display: none; /* heavy tile canvas is a desktop spectacle */
+  }
+  .reel-ui {
+    display: none; /* detail+legend drive the hidden canvas; fallback grid carries content on mobile */
+  }
+  .reel-fallback {
+    display: grid;
+  }
+  .film-numeral {
+    top: 4vh;
+    font-size: clamp(7rem, 40vw, 16rem);
+  }
+  .film-panel {
+    padding-bottom: 22vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-cta-ring { animation: none; }
+  .film-rail-fill { transition: none; }
 }
