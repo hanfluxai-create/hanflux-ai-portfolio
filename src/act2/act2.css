@@ -24,6 +24,9 @@ body {
    flow, so we restore the INTENDED fixed positioning (Act I source untouched). */
 .canvas {
   position: fixed !important;
+  /* page scroll now drives the Act I carousel — let vertical touch-scroll pass
+     through the canvas (the @use-gesture drag is bypassed in scroll-driven mode) */
+  touch-action: pan-y;
 }
 
 /* --- fade Act I back once the visitor has descended ------------------------ */
@@ -51,6 +54,14 @@ body.in-act2 .canvas {
 .act2-spacer {
   position: relative;
   height: 100vh;
+  pointer-events: none;
+}
+
+/* PINNED HERO: tall pass-through region over the fixed Act I canvas. Its scroll
+   length (height set inline = ~one viewport per card) steps the carousel; clicks
+   fall through to Act I, only the descend cue is interactive. */
+.hero-scroll {
+  position: relative;
   pointer-events: none;
 }
 
@@ -97,10 +108,11 @@ body.in-act2 .act2-aurora {
 
 /* ============================ descend / ascend ============================ */
 .descend {
-  position: absolute;
+  position: fixed; /* a persistent "scroll to explore" cue during the pinned hero */
   left: 50%;
   bottom: clamp(2rem, 6vh, 4rem);
   transform: translateX(-50%);
+  z-index: 14;
   pointer-events: auto;
   display: flex;
   flex-direction: column;
@@ -111,6 +123,12 @@ body.in-act2 .act2-aurora {
   font-size: 0.7rem;
   letter-spacing: 0.32em;
   text-transform: uppercase;
+  transition: opacity 0.5s ease;
+}
+/* hide it once we've stepped past the hero into the descent */
+body.in-act2 .descend {
+  opacity: 0;
+  pointer-events: none;
 }
 .descend-label {
   animation: pulse 2.6s ease-in-out infinite;

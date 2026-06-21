@@ -5,6 +5,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ACT2 } from './content2'
 import { scrollState } from './scrollState'
 import { useStore } from '../store/store'
+import { heroNav } from './heroNav'
+import { CAPABILITIES } from '../config/content'
 import { Filmstrip } from './Filmstrip'
 import { Dive } from './Dive'
 import { WorkReel } from './WorkReel'
@@ -13,6 +15,8 @@ import { SplitReveal, useStaggerReveal } from './kinetic'
 import './act2.css'
 
 gsap.registerPlugin(ScrollTrigger)
+
+const CARDS = CAPABILITIES.length // Act I carousel card count → hero scroll length
 
 /**
  * ACT II + III — "The Descent". Lives vertically BELOW the Act I immersive hero.
@@ -27,6 +31,7 @@ gsap.registerPlugin(ScrollTrigger)
 export function DownwardWorld({ webgl = true }: { webgl?: boolean }) {
   const lenisRef = useRef<Lenis | null>(null)
   const scope = useRef<HTMLDivElement>(null)
+  const heroRef = useRef<HTMLDivElement>(null)
 
   // --- Lenis smooth scroll + GSAP ScrollTrigger sync -----------------------
   useEffect(() => {
@@ -36,9 +41,9 @@ export function DownwardWorld({ webgl = true }: { webgl?: boolean }) {
       smoothWheel: !reduce,
       wheelMultiplier: 1,
       autoRaf: false,
-      // let Act I's canvas keep its own wheel/drag (the 3D carousel)
-      prevent: (node) =>
-        node?.classList?.contains('canvas') || !!node?.closest?.('.canvas, .chat-panel'),
+      // page scroll now drives BOTH the Act I carousel (via the hero region) and the
+      // descent, so Lenis must NOT ignore the canvas any more — only the chat panel.
+      prevent: (node) => !!node?.closest?.('.chat-panel'),
     })
     lenisRef.current = lenis
 
@@ -47,11 +52,30 @@ export function DownwardWorld({ webgl = true }: { webgl?: boolean }) {
     gsap.ticker.add(onTick)
     gsap.ticker.lagSmoothing(0)
 
-    // cross-the-threshold → fade Act I back, reveal Act II
+    // page scroll → Act I capability carousel (pinned hero). The Act I canvas is
+    // position:fixed, so it stays in view while the tall hero region scrolls past,
+    // stepping one card at a time. Carousel reads heroNav.index in its useFrame.
+    heroNav.driven = true
+    let heroST: ScrollTrigger | null = null
+    if (heroRef.current) {
+      heroST = ScrollTrigger.create({
+        trigger: heroRef.current,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: true,
+        onUpdate: (self) => {
+          heroNav.index = self.progress * (CARDS - 1)
+        },
+      })
+    }
+
+    // fade Act I back as the hero region ends and the descent begins
     let inAct2 = false
     const onScroll = ({ scroll }: { scroll: number }) => {
-      const past = scroll > window.innerHeight * 0.45
-      scrollState.inAct2 = Math.min(1, scroll / window.innerHeight)
+      const vh = window.innerHeight
+      const heroH = heroRef.current?.offsetHeight ?? vh
+      const past = scroll > heroH - vh * 0.9
+      scrollState.inAct2 = Math.min(1, Math.max(0, (scroll - (heroH - vh)) / vh))
       if (past !== inAct2) {
         inAct2 = past
         document.body.classList.toggle('in-act2', past)
@@ -60,6 +84,8 @@ export function DownwardWorld({ webgl = true }: { webgl?: boolean }) {
     lenis.on('scroll', onScroll)
 
     return () => {
+      heroST?.kill()
+      heroNav.driven = false
       gsap.ticker.remove(onTick)
       lenis.off('scroll', ScrollTrigger.update)
       lenis.destroy()
@@ -96,6 +122,30 @@ export function DownwardWorld({ webgl = true }: { webgl?: boolean }) {
     return () => window.clearTimeout(t)
   }, [])
 
+  // --- keyboard a11y: arrows step the pinned hero one card at a time --------
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return
+      const hero = heroRef.current
+      const lenis = lenisRef.current
+      if (!hero || !lenis) return
+      const maxScroll = Math.max(0, hero.offsetHeight - window.innerHeight)
+      if (window.scrollY > maxScroll + 4) return // past the hero → normal Act II scroll
+      const step = maxScroll / Math.max(1, CARDS - 1)
+      const idx = Math.round(window.scrollY / step)
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+        e.preventDefault()
+        lenis.scrollTo(Math.min(maxScroll, (idx + 1) * step), { duration: 0.9 })
+      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        e.preventDefault()
+        lenis.scrollTo(Math.max(0, (idx - 1) * step), { duration: 0.9 })
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
   // --- stagger-reveal the supporting (non-canvas) blocks -------------------
   useStaggerReveal(scope, '.kreveal')
 
@@ -107,9 +157,17 @@ export function DownwardWorld({ webgl = true }: { webgl?: boolean }) {
       {/* drifting colour aurora — fixed, lives behind every Act II/III section */}
       <div className="act2-aurora" aria-hidden="true" />
 
-      {/* first viewport: Act I shows through; only the descend cue is clickable */}
-      <div className="act2-spacer" aria-hidden="true">
-        <button className="descend" onClick={descend} data-hover aria-label="Descend to what we build">
+      {/* PINNED HERO: a tall pass-through region over the fixed Act I canvas.
+          Scrolling through it steps the capability carousel one card at a time
+          (heroNav.index), then releases into the descent. pointer-events:none so
+          card clicks/hover still reach Act I; the descend cue stays clickable. */}
+      <div
+        className="hero-scroll"
+        ref={heroRef}
+        aria-hidden="true"
+        style={{ height: `${100 + (CARDS - 1) * 82}vh` }}
+      >
+        <button className="descend" onClick={descend} data-hover aria-label="Skip to what we build">
           <span className="descend-label">{ACT2.threshold.cue}</span>
           <span className="descend-arrow" />
         </button>

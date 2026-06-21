@@ -13,6 +13,7 @@ import {
   buildDissolveGeometry,
   dissolvePointSize,
 } from '../shaders/dissolve'
+import { heroNav } from '../act2/heroNav'
 
 // point-grid density per quality tier (cols x rows = points per card)
 const GRID = { high: [120, 76], medium: [88, 56], low: [48, 30] } as const
@@ -72,6 +73,7 @@ export function Carousel() {
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName
       if (tag === 'INPUT' || tag === 'TEXTAREA') return
+      if (heroNav.driven) return // scroll-driven; the page scroller handles arrows
       if (e.key === 'ArrowLeft') {
         target.current = clamp(target.current - 1, 0, last)
         velocity.current = 0
@@ -122,19 +124,23 @@ export function Carousel() {
   useGesture(
     {
       onDragStart: () => {
+        if (heroNav.driven) return
         dragging.current = true
         velocity.current = 0
       },
       onDrag: ({ delta: [dx], down }) => {
+        if (heroNav.driven) return
         target.current = clamp(target.current - dx * C.dragSpeed, 0, last)
         velocity.current = -dx * C.dragSpeed
         dragging.current = down
       },
       onDragEnd: ({ velocity: [vx], direction: [dirx] }) => {
+        if (heroNav.driven) return
         dragging.current = false
         target.current = clamp(target.current - dirx * vx * 0.9, 0, last)
       },
       onWheel: ({ delta: [, dy], event }) => {
+        if (heroNav.driven) return // page scrolls instead (pinned-hero nav)
         event.preventDefault?.()
         dragging.current = false
         target.current = clamp(target.current + dy * C.wheelSpeed, 0, last)
@@ -177,8 +183,13 @@ export function Carousel() {
     const D = (cur: number, tgt: number, lambda = C.damp) =>
       reduced ? tgt : damp(cur, tgt, lambda, dt)
 
-    // inertia + snap when not dragging and nothing focused
-    if (!dragging.current) {
+    // page-scroll drives the carousel when the pinned-hero nav is active (Act I);
+    // skip while a card is focused so the expand interaction isn't yanked by scroll
+    if (heroNav.driven && selected === null) {
+      target.current = clamp(heroNav.index, 0, last)
+      velocity.current = 0
+    } else if (!dragging.current) {
+      // inertia + snap when not dragging and nothing focused
       if (!reduced && Math.abs(velocity.current) > 0.0005 && selected === null) {
         target.current = clamp(target.current + velocity.current, 0, last)
         velocity.current *= 0.92
