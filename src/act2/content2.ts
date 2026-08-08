@@ -1,154 +1,302 @@
 /**
- * ACT II — "The Descent" — all copy in one place.
- * This is the long-form, scroll-driven world that lives vertically BELOW the
- * Act I immersive hero. Act I is never touched; this is purely additive.
+ * ACT II — "THE SPIRE" — all copy in one place.
+ * The vertical AI campus you descend past for the whole act: divisions, proof,
+ * process, and pricing. Edit text/data here — no component edits needed.
  *
- * Voice: confident, specific, slightly cinematic — what Hanflux AI actually
- * does (Claude skills + agents, n8n workflow automation, realtime voice AI).
+ * Voice: confident, specific, anti-hype. Grounded in 2026 market research:
+ *  · MIT "GenAI Divide": 95% of enterprise AI pilots never touch P&L; externally
+ *    built systems reach production 2× as often (67% vs 33%).
+ *  · Gartner: >40% of agentic AI projects will be cancelled by end-2027 —
+ *    de-risking is the product.
+ *  · None of the leading agencies publish pricing; transparent fixed-fee tiers
+ *    are an open trust wedge. Post-deployment reliability ops ("SRE for AI")
+ *    is unclaimed flagship territory. This copy takes both positions.
+ *
+ * House style: no en/em dashes anywhere in rendered strings. Use periods,
+ * commas, or colons instead.
  */
 
 export const ACT2 = {
-  // The threshold between Act I and Act II
+  // The threshold between Act I and Act II — the crown of the Spire
   threshold: {
-    kicker: 'BELOW THE SIGNAL',
-    title: ['WHAT', 'WE BUILD'],
-    sub: 'You just met the surface. Keep descending — this is the machinery underneath: the agents, the automations, and the voices we wire into living systems.',
-    cue: 'scroll to descend',
+    kicker: 'YOU ARE ENTERING THE SPIRE',
+    title: ['ONE MACHINE.', 'EVERY WORKFLOW.'],
+    sub: 'This is where AI stops being a demo. Voice, agents, orchestration, memory, growth, and the ops layer that keeps it all alive after launch. Descend.',
+    cue: 'begin the descent',
   },
 
-  // The floating glass constellation — the capabilities, deeper than Act I
-  arsenal: {
-    kicker: 'THE ARSENAL',
-    title: 'Six instruments. One autonomous layer.',
-    sub: 'Each is a glass module in the same machine — composable, observable, and always on.',
-  },
-
-  // The capability cards rendered as floating glass in 3D
+  // The divisions — rendered as the pinned filmstrip. `a` is the division
+  // accent that grades the entire city.
   capabilities: [
     {
       id: 'voice',
       no: '01',
-      tag: 'REALTIME VOICE',
+      tag: 'VOICE DIVISION',
       title: 'AI Voice Agents',
       blurb:
-        'Human-grade voice that answers, qualifies, books and follows up — 24/7, in any language, at sub-second latency. Indistinguishable from your best rep.',
-      bullets: ['Inbound + outbound calling', 'Natural turn-taking & barge-in', 'Calendar, CRM & payment actions'],
+        'Picks up before the second ring, in any language, and books the job while your competitor’s phone is still ringing. Speed-to-lead is a solved problem here.',
+      bullets: [
+        'Inbound + outbound at any volume',
+        'Books, routes and recaps into your CRM',
+        'Sub-second turn-taking, barge-in, transfer to human',
+      ],
       a: '#27F2C0',
       b: '#0c5c5a',
     },
     {
-      id: 'automation',
+      id: 'foundry',
       no: '02',
-      tag: 'ORCHESTRATION',
-      title: 'Workflow Automation',
+      tag: 'AGENT FOUNDRY',
+      title: 'Custom Agents & Skills',
       blurb:
-        'n8n-grade pipelines that wire your entire stack into one nervous system — triggers, branching logic, retries and self-healing. The work runs itself.',
-      bullets: ['500+ app connectors', 'Event & schedule triggers', 'Human-in-the-loop checkpoints'],
+        'Claude agents shaped to your exact workflow: they read your tools over MCP, plan multi-step work, and check their own output against a rubric before you ever see it.',
+      bullets: [
+        'Bespoke skills, versioned like code',
+        'MCP integrations: your stack becomes their toolbox',
+        'Sub-agent teams: research, drafting, QA in parallel',
+      ],
       a: '#7C5CFF',
       b: '#241a4d',
     },
     {
-      id: 'skills',
+      id: 'orchestration',
       no: '03',
-      tag: 'CLAUDE SKILLS · MCP',
-      title: 'Agents & Skills',
+      tag: 'ORCHESTRATION',
+      title: 'Workflow Automation',
       blurb:
-        'Bespoke Claude skills and MCP-connected agents that read your tools, reason over your data, and take action — intelligence shaped to your exact workflow.',
-      bullets: ['Custom skills & tool use', 'MCP server integrations', 'RAG over your knowledge'],
+        'An n8n nervous system wiring your entire stack into one graph: triggers, branching, retries with backoff, and a human checkpoint before anything irreversible fires.',
+      bullets: [
+        '500+ app connectors',
+        'Self-healing: error triggers + automatic retries',
+        'Human-in-the-loop gates on expensive actions',
+      ],
+      a: '#4EA8FF',
+      b: '#0c2b4d',
+    },
+    {
+      id: 'memory',
+      no: '04',
+      tag: 'MEMORY VAULT',
+      title: 'RAG & Knowledge Systems',
+      blurb:
+        'Your documents, tickets and tribal knowledge become an answer engine where every response traces to a real source. Permission-aware, current, never a guess.',
+      bullets: [
+        'Vector index + long context over your corpus',
+        'Access control mirrored from your permissions',
+        'Citations on every answer',
+      ],
+      a: '#FFB36B',
+      b: '#4d2c0c',
+    },
+    {
+      id: 'growth',
+      no: '05',
+      tag: 'GROWTH ENGINE',
+      title: 'Revenue Systems',
+      blurb:
+        'Outbound that researches, personalises and books while you sleep. Inbound where no call, chat or form ever goes unanswered. Pipeline without headcount.',
+      bullets: [
+        'Account research → sequence → booked meeting',
+        'Reply detection and intelligent routing',
+        'Every lead logged, scored, followed up',
+      ],
       a: '#FF3D7F',
       b: '#4d1029',
     },
     {
-      id: 'inbound',
-      no: '04',
-      tag: 'INBOUND',
-      title: 'AI Receptionist',
-      blurb:
-        'Every call, chat and form answered instantly, routed intelligently and logged automatically. Never a missed lead, never a closed door.',
-      bullets: ['Instant pickup, zero hold', 'Smart routing & triage', 'Full transcript + summary'],
-      a: '#27F2C0',
-      b: '#1a3a4d',
-    },
-    {
-      id: 'outbound',
-      no: '05',
-      tag: 'GROWTH',
-      title: 'Outbound Engine',
-      blurb:
-        'Autonomous research, outreach and nurture that scales pipeline without scaling headcount. It prospects while you sleep and hands you warm replies.',
-      bullets: ['Account & contact research', 'Personalised sequences', 'Reply detection & booking'],
-      a: '#7C5CFF',
-      b: '#0c2b4d',
-    },
-    {
-      id: 'cortex',
+      id: 'ops',
       no: '06',
-      tag: 'ANALYTICS',
-      title: 'Insight Cortex',
+      tag: 'SPIRE OPS · FLAGSHIP',
+      title: 'AI Reliability Ops',
       blurb:
-        'Every call, flow and conversion captured and understood in real time — the signal beneath the automation, turned into decisions.',
-      bullets: ['Live dashboards', 'Call & funnel analytics', 'Anomaly + opportunity alerts'],
-      a: '#FF3D7F',
-      b: '#3a1a4d',
+        'The layer nobody else sells: we run your AI after it ships. Evals, monitoring, drift detection, cost tuning, model migrations. SRE for your agents, as a product.',
+      bullets: [
+        'Continuous evals against your rubric',
+        'Live dashboards: latency, cost, resolution rate',
+        'Model migrations when a better/cheaper one lands',
+      ],
+      a: '#9AE6FF',
+      b: '#12384d',
     },
   ],
 
-  // The living loop — how the system works
+  // The build loop — process transparency as proof. This is the eval loop
+  // buyers never get shown: how we decide ship / no-ship.
   loop: {
-    kicker: 'THE LIVING LOOP',
-    title: 'It listens, understands, acts — then gets sharper.',
+    kicker: 'HOW A SYSTEM GETS BUILT',
+    title: 'We don’t demo. We deploy, prove, and keep it alive.',
     steps: [
       {
         no: '01',
-        title: 'Listen',
-        body: 'Calls, messages, forms, webhooks and events stream in across every channel you run.',
+        title: 'Map',
+        body: 'A short recon of your real workflows. Most aren’t worth automating. We score the few that are, with ROI math attached.',
       },
       {
         no: '02',
-        title: 'Understand',
-        body: 'Claude reasons over context, intent and your knowledge base to decide what actually matters.',
+        title: 'Build',
+        body: 'A working system on your real data in weeks. The same people who scope it build it. No bait-and-switch.',
       },
       {
         no: '03',
-        title: 'Act',
-        body: 'Agents book, reply, update, escalate and orchestrate tools through n8n — end to end.',
+        title: 'Prove',
+        body: 'An eval harness scores every output against your rubric. It ships when the numbers clear the bar, not when the demo looks good.',
       },
       {
         no: '04',
-        title: 'Learn',
-        body: 'Every outcome is logged and fed back, so the system compounds instead of standing still.',
+        title: 'Run',
+        body: 'Monitoring, drift alerts, cost tuning and upgrades. The system compounds instead of quietly rotting.',
       },
     ],
   },
 
-  // The stack we wield — honest credibility
+  // The build log — a running, specific record of what actually gets wired.
+  buildLog: {
+    kicker: 'THE BUILD LOG',
+    title: 'Not a menu. A running log of what gets wired.',
+    sub: 'Pull any line. We scope it this week.',
+    entries: [
+      {
+        tag: 'claude',
+        title: 'Agent SDK builds',
+        body: 'Multi-step agents that plan, call tools, check their own work against a rubric, and retry before you ever see the output.',
+      },
+      {
+        tag: 'n8n',
+        title: 'AI Agent nodes',
+        body: "Claude's reasoning wired straight into n8n's graph, so a workflow stops just triggering and starts deciding.",
+      },
+      {
+        tag: 'claude',
+        title: 'Custom Skills',
+        body: 'Packaged expertise Claude loads on demand: your playbooks, your tone, your edge cases, versioned like code.',
+      },
+      {
+        tag: 'n8n',
+        title: 'Self-healing workflows',
+        body: 'Error triggers, retries with backoff, and a human-in-the-loop checkpoint before anything expensive or irreversible fires.',
+      },
+      {
+        tag: 'claude',
+        title: 'MCP integrations',
+        body: 'Your CRM, calendar and ticketing system exposed as tools Claude can call directly. No fragile screen-scraping.',
+      },
+      {
+        tag: 'both',
+        title: 'Realtime voice loop',
+        body: 'Sub-second STT → Claude → TTS, wired straight into telephony. The agent picks up before the second ring.',
+      },
+      {
+        tag: 'claude',
+        title: 'Eval harnesses',
+        body: 'Golden sets, rubric scoring and regression gates: the ship/no-ship instrument every AI build should come with, and almost none do.',
+      },
+      {
+        tag: 'n8n',
+        title: '500+ connectors',
+        body: 'Every app in your stack wired into one graph: CRM, calendar, Slack, Stripe, your own internal APIs.',
+      },
+      {
+        tag: 'both',
+        title: 'Model migrations',
+        body: 'When a better or cheaper model lands, we re-run your evals, migrate the prompts, and cut costs without breaking behaviour.',
+      },
+      {
+        tag: 'claude',
+        title: 'Computer-use QA',
+        body: 'An agent that drives a real browser like a user would, files the bug, and attaches the repro.',
+      },
+      {
+        tag: 'both',
+        title: 'RAG over your knowledge',
+        body: 'Vector-indexed docs plus long context, so every answer traces back to a real source. Never a guess.',
+      },
+      {
+        tag: 'claude',
+        title: 'Sub-agent orchestration',
+        body: 'One orchestrator and a bench of specialists for research, drafting and QA, run in parallel and merged into a single answer.',
+      },
+    ],
+  },
+
+  // The stack we wield — honest credibility, model-agnostic by design
   stack: {
     kicker: 'THE STACK WE WIELD',
     title: 'Best-in-class parts, welded into one machine.',
     groups: [
-      { label: 'Intelligence', items: ['Claude Opus', 'Claude Sonnet', 'Claude Haiku', 'Custom Skills', 'MCP'] },
+      {
+        label: 'Intelligence',
+        items: ['Claude (first-choice)', 'GPT / Gemini', 'Open-weights', 'Custom Skills', 'MCP'],
+      },
       { label: 'Automation', items: ['n8n', 'Webhooks', 'Schedulers', 'Queues', 'Zapier bridge'] },
       { label: 'Voice', items: ['Realtime STT/TTS', 'Telephony (SIP)', 'Barge-in', 'Multilingual'] },
       { label: 'Memory', items: ['Vector DB / RAG', 'Postgres', 'Knowledge bases'] },
+      { label: 'Proof', items: ['Eval harnesses', 'Live dashboards', 'Tracing & logs'] },
       { label: 'Surfaces', items: ['Web', 'WhatsApp', 'Email', 'Slack', 'CRM'] },
     ],
   },
 
-  // Proof / outcome metrics
+  // Proof / outcome metrics — one band, four numbers a buyer's boss cares about
   metrics: [
     { v: '24/7', l: 'always-on agents' },
     { v: '<1s', l: 'voice response latency' },
-    { v: '500+', l: 'integrations wired' },
-    { v: '∞', l: 'concurrent conversations' },
+    { v: '500+', l: 'app connectors on tap' },
+    { v: '2×', l: 'ship rate of external builds vs in-house (MIT)' },
   ],
 
-  // Final CTA
+  // Ways in — transparent fixed-fee tiers. None of the market publishes
+  // pricing; this section is deliberately the exception.
+  engage: {
+    kicker: 'WAYS IN',
+    title: 'Three doors. Fixed fees. No mystery.',
+    sub: 'MIT found 95% of enterprise AI pilots never touch the P&L, and that externally built systems reach production twice as often. Closing that gap is our entire business, so every phase is fixed-fee, and part of it can ride on the KPI we commit to.',
+    tiers: [
+      {
+        no: '01',
+        name: 'Signal Audit',
+        window: '2 weeks',
+        price: 'from $3,000',
+        body: 'We map your workflows, find the few automations actually worth building, and hand you a scored roadmap with ROI math. Yours to keep. Build it with anyone.',
+      },
+      {
+        no: '02',
+        name: 'First Agent Live',
+        window: '3 to 6 weeks',
+        price: 'from $10,000',
+        body: 'One workflow (voice, agent or automation) wired end to end on your real data, with an eval harness proving it works before anyone relies on it.',
+      },
+      {
+        no: '03',
+        name: 'The Autonomous Layer',
+        window: '6 to 12 weeks',
+        price: 'from $30,000',
+        body: 'Voice, agents, orchestration and memory deployed across the org, with training so your team owns what we built.',
+      },
+    ],
+    retainer: {
+      name: 'SPIRE OPS',
+      price: 'from $1,500/mo',
+      body: 'The service that never sleeps: monitoring, evals, drift alerts, cost tuning, model migrations, and a new automation shipped every month.',
+    },
+  },
+
+  // Trust strip — the four questions every AI buyer actually asks, answered
+  trust: {
+    kicker: 'THE FINE PRINT, UP FRONT',
+    items: [
+      { title: 'Your data trains nothing', body: 'Never used to train anyone’s models. In the contract, in writing.' },
+      { title: 'Model-agnostic', body: 'Claude, GPT, Gemini or open weights: the best model per job. You are never locked in.' },
+      { title: 'Humans on the loop', body: 'Checkpoints before anything expensive or irreversible fires.' },
+      { title: 'Audit-ready', body: 'Logged decisions, scoped access, least-privilege keys on every build.' },
+    ],
+  },
+
+  // Final CTA (the Portal carries the primary close; kept for reuse)
   cta: {
-    kicker: 'THE SURFACE WAS THE INTRO',
-    title: ['Let’s build your', 'autonomous layer.'],
-    body: 'Tell us the work you keep doing by hand. We’ll wire the agents, the automations and the voice that make it run itself.',
+    kicker: 'STREET LEVEL',
+    title: ['Get your AI', 'into production.'],
+    body: 'Tell us the work you keep doing by hand. We’ll wire the voice, the agents and the automations that make it run itself. Then we’ll keep them alive.',
     email: 'hello@hanflux.ai',
-    button: 'Start the build',
+    button: 'Get your AI into production',
   },
 }
 

@@ -48,7 +48,7 @@ export function ChatNavigator() {
     if (!q) return
     const local = resolveIntent(q)
     if (local.confidence >= 0.6) {
-      go(local.section, `Got it — heading to ${SECTION_LABEL[local.section]}.`)
+      go(local.section, `Got it, heading to ${SECTION_LABEL[local.section]}.`)
       return
     }
     setThinking(true)

@@ -1,111 +1,29 @@
 /* ============================================================================
-   ACT II centerpiece — "THE ARSENAL" as a pinned, horizontally-scrubbed
-   kinetic filmstrip. One full-bleed flow-shader backdrop morphs its hue through
-   each capability while a track of giant parallax numerals + kinetic type slides
-   across. GPU-cheap (single shader pass); crisp DOM typography over it.
+   ACT II centerpiece — the DIVISIONS of the Spire as a pinned, horizontally-
+   scrubbed filmstrip. The panels are transparent glass HUD cards riding OVER
+   the persistent CityWorld canvas: as each division takes focus it writes its
+   accent into scrollState.divisionColor and the entire city — helix strand,
+   fog, rings, window accents, ground beacons — regrades to match.
 
-   Self-contained: owns its ScrollTrigger (pin via CSS sticky + scrub), writes
-   scrollState for the canvas, and gates the canvas with IntersectionObserver so
-   only one extra heavy canvas is ever live.
+   Self-contained: owns its ScrollTrigger (pin via CSS sticky + scrub) and
+   per-panel parallax/focus. No canvas of its own any more — one fewer GPU
+   surface than the previous build; the city IS the backdrop.
    ========================================================================== */
 import { useEffect, useRef, useState } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { Color, type Mesh } from 'three'
 import { ACT2 } from './content2'
 import { scrollState } from './scrollState'
-import './shaders' // registers <flowFieldMaterial> + types
 
 gsap.registerPlugin(ScrollTrigger)
 
 const CAPS = ACT2.capabilities
-const ACCENT = ['#7c5cff', '#27f2c0', '#ff3d7f'] // uColorC cycle
-const reduced = () =>
-  typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
-// precompute each capability's colour triad ONCE (no per-frame hex parsing)
-const CAP_COLORS = CAPS.map((c, i) => ({
-  a: new Color(c.a),
-  b: new Color(c.b),
-  c: new Color(ACCENT[i % ACCENT.length]),
-}))
-
-/* --- the single full-viewport flow plane (hue lerps to active capability) -- */
-function FlowPlane() {
-  const mesh = useRef<Mesh>(null)
-  const mat = useRef<any>(null)
-  const { viewport } = useThree()
-
-  // working colours we lerp every frame (clones — never mutate CAP_COLORS)
-  const cur = useRef({
-    a: CAP_COLORS[0].a.clone(),
-    b: CAP_COLORS[0].b.clone(),
-    c: CAP_COLORS[0].c.clone(),
-  })
-
-  useFrame((_, delta) => {
-    const dt = Math.min(delta, 1 / 30)
-    if (mesh.current) mesh.current.scale.set(viewport.width, viewport.height, 1)
-    const m = mat.current
-    if (!m) return
-    const isReduced = reduced()
-
-    // fractional active index across the rail
-    const f = scrollState.galleryProgress * (CAPS.length - 1)
-    const i = Math.max(0, Math.min(CAPS.length - 1, Math.round(f)))
-    const tgt = CAP_COLORS[i]
-
-    const k = isReduced ? 1 : 1 - Math.pow(0.0015, dt) // frame-rate-independent lerp
-    cur.current.a.lerp(tgt.a, k)
-    cur.current.b.lerp(tgt.b, k)
-    cur.current.c.lerp(tgt.c, k)
-
-    // ambient flow always animates — gentle background motion reads as "alive" on
-    // every device (incl. phones with Reduce Motion on); big motions still snap below
-    m.uTime += dt
-    m.uColorA.copy(cur.current.a)
-    m.uColorB.copy(cur.current.b)
-    m.uColorC.copy(cur.current.c)
-    m.uPointer.set(scrollState.pointerX, scrollState.pointerY)
-    // focus brightens near the centre of a panel, dims in the gaps
-    const frac = Math.abs(f - Math.round(f))
-    m.uIntensity += ((1 - frac * 1.3) - m.uIntensity) * (isReduced ? 1 : 0.08)
-    m.uReveal += (Math.min(1, scrollState.inAct2 * 1.5) - m.uReveal) * (isReduced ? 1 : 0.06)
-  })
-
-  return (
-    <mesh ref={mesh}>
-      <planeGeometry args={[1, 1]} />
-      <flowFieldMaterial ref={mat} transparent depthWrite={false} />
-    </mesh>
-  )
-}
-
-function FlowCanvas() {
-  return (
-    <Canvas
-      gl={{ alpha: true, antialias: false, powerPreference: 'high-performance' }}
-      dpr={[1, 1.5]}
-      camera={{ position: [0, 0, 2], fov: 50 }}
-      style={{ position: 'absolute', inset: 0 }}
-    >
-      <FlowPlane />
-      <EffectComposer>
-        <Bloom mipmapBlur intensity={0.7} luminanceThreshold={0.35} luminanceSmoothing={0.85} />
-      </EffectComposer>
-    </Canvas>
-  )
-}
-
-/* --- the filmstrip ------------------------------------------------------- */
-export function Filmstrip({ webgl = true }: { webgl?: boolean }) {
+export function Filmstrip() {
   const section = useRef<HTMLElement>(null)
   const track = useRef<HTMLDivElement>(null)
   const panels = useRef<(HTMLElement | null)[]>([])
   const [active, setActive] = useState(0)
-  const [live, setLive] = useState(false)
 
   // pin (CSS sticky) + horizontal scrub
   useEffect(() => {
@@ -130,35 +48,32 @@ export function Filmstrip({ webgl = true }: { webgl?: boolean }) {
           if (!el) return
           const off = i - f
           const ad = Math.abs(off)
+          // steeper-than-linear falloff: the outgoing panel's copy dims hard and
+          // fast so it never sits legibly on top of the incoming one mid-scrub —
+          // a clean focus-pull instead of a double-exposure.
+          const foc = Math.pow(Math.max(0, 1 - ad * 1.1), 2.2)
           el.style.setProperty('--off', String(off))
-          el.style.setProperty('--foc', String(Math.max(0, 1 - ad * 1.25)))
+          el.style.setProperty('--foc', String(foc))
         })
         const i = Math.max(0, Math.min(N - 1, Math.round(f)))
+        // write every update (not just on change): re-entering the strip from a
+        // section below must restore this division's grade + HUD label
+        scrollState.divisionColor = CAPS[i].a
+        scrollState.hudLabel = CAPS[i].tag
         setActive((prev) => (prev === i ? prev : i))
       },
     })
     return () => st.kill()
   }, [])
 
-  // gate the canvas to near-view only
-  useEffect(() => {
-    const el = section.current
-    if (!el) return
-    const io = new IntersectionObserver(
-      ([e]) => setLive(webgl && e.isIntersecting),
-      { rootMargin: '30% 0px 30% 0px' },
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [webgl])
-
   return (
-    <section className="filmstrip" ref={section} aria-label="What we build">
+    <section
+      className="filmstrip"
+      ref={section}
+      aria-label="The divisions of the Spire"
+      data-division="THE DIVISIONS"
+    >
       <div className="film-stage">
-        <div className="film-canvas" aria-hidden="true">
-          {live && <FlowCanvas />}
-        </div>
-
         <div className="film-track" ref={track}>
           {CAPS.map((c, i) => (
             <article
@@ -168,6 +83,7 @@ export function Filmstrip({ webgl = true }: { webgl?: boolean }) {
                 panels.current[i] = el
               }}
               data-on={i === active}
+              style={{ ['--cap-a' as string]: c.a }}
             >
               <span className="film-numeral" aria-hidden="true">
                 {c.no}

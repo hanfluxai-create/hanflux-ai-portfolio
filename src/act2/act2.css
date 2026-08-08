@@ -67,14 +67,13 @@ body.in-act2 .canvas {
 
 .act2 {
   position: relative;
-  z-index: 1; /* content rides above the fixed aurora + Act I particle field */
-  /* a translucent dark scrim (keeps text legible) over the living particle void
-     + soft nebula glows, so Act II is atmospheric, never flat black */
+  z-index: 1; /* content rides above the fixed CityWorld canvas + aurora */
+  /* a LIGHT scrim only — the Spire megacity behind must stay clearly visible;
+     legibility comes from local glass surfaces + a left-weighted gradient that
+     darkens where the copy sits and leaves the right open for the city */
   background:
-    radial-gradient(90% 45% at 12% 0%, rgba(39, 242, 192, 0.12), transparent 60%),
-    radial-gradient(75% 55% at 92% 22%, rgba(124, 92, 255, 0.14), transparent 62%),
-    radial-gradient(70% 50% at 50% 100%, rgba(255, 61, 127, 0.1), transparent 65%),
-    linear-gradient(180deg, rgba(5, 6, 10, 0.62), rgba(5, 6, 10, 0.74));
+    linear-gradient(100deg, rgba(5, 6, 10, 0.55) 0%, rgba(5, 6, 10, 0.34) 46%, rgba(5, 6, 10, 0.16) 100%),
+    linear-gradient(180deg, rgba(5, 6, 10, 0.35), rgba(5, 6, 10, 0.28));
   border-top: 1px solid var(--hair-teal);
   box-shadow: 0 -40px 140px rgba(39, 242, 192, 0.1);
 }
@@ -106,12 +105,62 @@ body.in-act2 .act2-aurora {
   .act2-aurora { animation: none; }
 }
 
+/* ============================ THE SPINE ==================================
+   A persistent progress thread run the full length of Act II/III — the
+   connective device that ties every section together across every seam,
+   independent of any single section's own scroll-jacking. */
+.spine {
+  position: fixed;
+  left: clamp(0.5rem, 2vw, 1.3rem);
+  top: 14vh;
+  bottom: 14vh;
+  width: 2px;
+  z-index: 13; /* above act2-root(12); below the custom cursor */
+  background: var(--hair);
+  border-radius: 2px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.7s ease;
+}
+body.in-act2 .spine {
+  opacity: 1;
+}
+.spine-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: calc(var(--spine, 0) * 100%);
+  background: linear-gradient(180deg, var(--teal), var(--violet) 55%, var(--pink));
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(39, 242, 192, 0.6);
+}
+.spine-fill::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -3px;
+  width: 7px;
+  height: 7px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: var(--pink);
+  box-shadow: 0 0 8px var(--pink), 0 0 18px rgba(255, 61, 127, 0.7);
+}
+@media (max-width: 860px) {
+  .spine { display: none; } /* the ascend/legend chrome already crowds narrow viewports */
+}
+@media (prefers-reduced-motion: reduce) {
+  .spine { transition: none; }
+}
+
 /* ============================ descend / ascend ============================ */
 .descend {
   position: fixed; /* a persistent "scroll to explore" cue during the pinned hero */
-  left: 50%;
-  bottom: clamp(2rem, 6vh, 4rem);
-  transform: translateX(-50%);
+  right: clamp(1.1rem, 3vw, 2.4rem);
+  bottom: clamp(4.6rem, 11vh, 6.5rem); /* bottom-right: clear of Act I's centered
+    caption + dots and of the corner webgl note (the ascend pill only exists
+    once in-act2, when this cue is already hidden) */
   z-index: 14;
   pointer-events: auto;
   display: flex;
@@ -404,7 +453,7 @@ body.in-act2 .ascend {
 
 /* ============================ LIVING LOOP =============================== */
 .loop-head {
-  max-width: 22ch;
+  max-width: 27ch;
   margin-bottom: clamp(2.5rem, 6vw, 5rem);
 }
 .loop-grid {
@@ -525,6 +574,74 @@ body.in-act2 .ascend {
   color: var(--teal);
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(39, 242, 192, 0.18);
+}
+
+/* ============================ BUILD LOG ================================= */
+.buildlog-head {
+  max-width: 30ch;
+  margin-bottom: clamp(2.2rem, 5vw, 3.6rem);
+}
+.buildlog-head .lede {
+  margin-top: 0.8rem;
+}
+.buildlog-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+.bl-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(7.5rem, 12ch) minmax(12rem, 20ch) 1fr;
+  align-items: baseline;
+  gap: clamp(0.6rem, 2vw, 2rem);
+  padding: 1.15rem 1.2rem;
+  border-top: 1px solid var(--hair);
+  border-left: 2px solid transparent;
+  transition: border-color 0.35s ease, background 0.35s ease, padding-left 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.buildlog-list li:last-child {
+  border-bottom: 1px solid var(--hair);
+}
+.bl-row:hover {
+  padding-left: 1.6rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+.bl-row.bl-claude { border-left-color: rgba(39, 242, 192, 0.55); }
+.bl-row.bl-n8n { border-left-color: rgba(124, 92, 255, 0.55); }
+.bl-row.bl-both { border-left-color: rgba(255, 61, 127, 0.55); }
+.bl-row:hover.bl-claude { border-top-color: var(--hair-teal); }
+.bl-row:hover.bl-n8n { border-top-color: rgba(124, 92, 255, 0.4); }
+.bl-row:hover.bl-both { border-top-color: rgba(255, 61, 127, 0.4); }
+.bl-tag {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.bl-claude .bl-tag { color: var(--teal); }
+.bl-n8n .bl-tag { color: var(--violet); }
+.bl-both .bl-tag { color: var(--pink); }
+.bl-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  color: var(--ink);
+}
+.bl-body {
+  color: var(--ink-dim);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  max-width: 56ch;
+}
+@media (max-width: 860px) {
+  .bl-row {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+    padding: 1.1rem 0.2rem;
+  }
+  .bl-row:hover { padding-left: 0.6rem; }
 }
 
 /* ============================ METRICS ================================== */
@@ -654,6 +771,47 @@ body.in-act2 .ascend {
   }
 }
 
+/* small phones: single-column process cards, tighter gutters and chrome */
+@media (max-width: 560px) {
+  .a2 {
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+  }
+  .loop-grid {
+    grid-template-columns: 1fr;
+  }
+  .loop-step {
+    min-height: 0;
+  }
+  .metric {
+    padding: 1.8rem 0.6rem;
+  }
+  .metric .m-l {
+    letter-spacing: 0.12em;
+  }
+  .film-panel {
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+  }
+  .film-bullets li {
+    font-size: 0.64rem;
+    padding: 0.4rem 0.7rem;
+  }
+  .film-index {
+    width: min(64vw, 16rem); /* keep clear of the percent HUD in the right corner */
+  }
+  .portal-cta {
+    padding: 1rem 1.8rem;
+    font-size: 1rem;
+  }
+  .portal-foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    padding-right: 9rem; /* clear the fixed SURFACE pill in the corner */
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .descend-label,
   .descend-arrow::after {
@@ -663,7 +821,7 @@ body.in-act2 .ascend {
 
 /* ████████████████████████████████████████████████████████████████████████
    ACT II/III — Active-Theory-caliber rebuild: kinetic type, the capability
-   filmstrip, the work reel, the portal finale. All additive; Act I untouched.
+   filmstrip, the portal finale. All additive; Act I untouched.
    ████████████████████████████████████████████████████████████████████████ */
 
 /* ============================ kinetic typography ========================= */
@@ -680,9 +838,12 @@ body.in-act2 .ascend {
   line-height: 0.92;
   letter-spacing: -0.025em;
   color: var(--ink);
-  overflow-wrap: break-word;
+  /* solid fill, not background-clip gradient, so no anti-clip break-word is
+     needed here — forcing it mid-word broke "UNDERSTANDS" into "UNDERS/TANDS"
+     at narrower widths. keep-all + balance wraps whole words instead. */
+  word-break: keep-all;
+  overflow-wrap: normal;
   text-wrap: balance;
-  /* solid fill (NOT background-clip gradient — that drops glyphs once split) */
   text-shadow: 0 0 60px rgba(39, 242, 192, 0.18);
 }
 .k-head.k-xl { font-size: clamp(3rem, 9vw, 8.5rem); }
@@ -705,8 +866,9 @@ body.in-act2 .ascend {
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  opacity: calc(1 - var(--film-outro, 0) * 0.7);
 }
-/* a soft dark scrim so type stays legible over the colour field */
+/* a soft dark scrim so type stays legible over the living city behind */
 .film-stage::after {
   content: '';
   position: absolute;
@@ -714,10 +876,9 @@ body.in-act2 .ascend {
   z-index: 1;
   pointer-events: none;
   background:
-    radial-gradient(70% 80% at 20% 75%, rgba(5, 6, 10, 0.82), transparent 62%),
-    radial-gradient(120% 120% at 50% 45%, transparent 35%, rgba(5, 6, 10, 0.55) 100%),
-    linear-gradient(180deg, rgba(5, 6, 10, 0.5), transparent 28%, rgba(5, 6, 10, 0.6));
-  box-shadow: inset 0 0 200px 50px rgba(5, 6, 10, 0.55);
+    radial-gradient(70% 80% at 20% 75%, rgba(5, 6, 10, 0.72), transparent 60%),
+    linear-gradient(180deg, rgba(5, 6, 10, 0.42), transparent 30%, rgba(5, 6, 10, 0.5));
+  box-shadow: inset 0 0 180px 40px rgba(5, 6, 10, 0.4);
 }
 .film-track {
   position: absolute;
@@ -758,6 +919,10 @@ body.in-act2 .ascend {
   max-width: 42rem;
   transform: translateX(calc(var(--off, 0) * -3.5vw));
   opacity: calc(0.05 + var(--foc, 0) * 0.95);
+  /* the outgoing panel softens out of focus as the incoming one sharpens in —
+     reads as a lens pulling focus rather than two panels fighting for legibility */
+  filter: blur(calc((1 - var(--foc, 0)) * 5px));
+  will-change: transform, opacity, filter;
 }
 .film-tag {
   display: inline-block;
@@ -765,7 +930,8 @@ body.in-act2 .ascend {
   font-size: 0.72rem;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--teal);
+  color: var(--cap-a, var(--teal));
+  text-shadow: 0 0 18px var(--cap-a, var(--teal));
   margin-bottom: 1.2rem;
 }
 .film-title {
@@ -852,285 +1018,6 @@ body.in-act2 .ascend {
   color: var(--ink-dim);
 }
 
-/* ============================ WORK REEL (Act III) ======================== */
-.reel {
-  position: relative;
-  z-index: 1;
-  padding: clamp(6rem, 14vh, 12rem) clamp(1.4rem, 6vw, 7rem);
-  max-width: 1640px;
-  margin: 0 auto;
-}
-.reel-head {
-  max-width: 34ch;
-  margin-bottom: clamp(2.5rem, 6vw, 5rem);
-}
-.reel-head .lede {
-  max-width: 52ch;
-}
-.reel-stage {
-  position: relative;
-}
-.reel-canvas {
-  position: relative;
-  width: 100%;
-  min-height: 68vh;
-  border-radius: 20px;
-  overflow: hidden;
-  border: 1px solid var(--hair);
-  background: radial-gradient(120% 120% at 50% 50%, rgba(124, 92, 255, 0.06), transparent 70%);
-}
-.reel-ui {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  grid-template-columns: 1fr minmax(260px, 22rem);
-  gap: clamp(1.5rem, 3vw, 3rem);
-  align-items: start;
-  margin-top: clamp(1.6rem, 3vw, 2.6rem);
-}
-.reel-detail {
-  animation: ga-in 0.5s ease both;
-}
-.rd-no {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1rem;
-  color: var(--teal);
-}
-.rd-sector {
-  display: inline-block;
-  margin-left: 0.8rem;
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-}
-.rd-title {
-  font-family: var(--font-display);
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: clamp(2rem, 4vw, 3.2rem);
-  line-height: 0.98;
-  letter-spacing: -0.02em;
-  margin: 0.7rem 0 1rem;
-  color: var(--ink);
-}
-.rd-blurb {
-  color: var(--ink-dim);
-  font-size: clamp(0.95rem, 1.15vw, 1.1rem);
-  line-height: 1.6;
-  max-width: 36ch;
-}
-.rd-metric {
-  display: inline-block;
-  margin-top: 1.2rem;
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 1.3rem;
-  background: linear-gradient(100deg, var(--teal), var(--violet));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-.rd-tags {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1.4rem;
-}
-.rd-tags li {
-  font-family: var(--font-mono);
-  font-size: 0.64rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-dim);
-  padding: 0.4rem 0.8rem;
-  border: 1px solid var(--hair);
-  border-radius: 999px;
-}
-.reel-legend {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  border-top: 1px solid var(--hair);
-}
-.rl {
-  display: flex;
-  align-items: baseline;
-  gap: 0.9rem;
-  width: 100%;
-  padding: 0.85rem 0;
-  border-bottom: 1px solid var(--hair);
-  color: var(--ink-faint);
-  text-align: left;
-  transition: color 0.3s ease, padding-left 0.3s ease;
-}
-.rl-no {
-  font-family: var(--font-mono);
-  font-size: 0.64rem;
-  opacity: 0.7;
-}
-.rl-title {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 1.15rem;
-}
-.rl:hover,
-.rl:focus-visible {
-  color: var(--teal);
-  padding-left: 0.6rem;
-  outline: none;
-}
-.rl[data-on='true'] {
-  color: var(--ink);
-  padding-left: 0.6rem;
-}
-.rl[data-on='true'] .rl-title {
-  text-shadow: 0 0 18px rgba(39, 242, 192, 0.45);
-}
-/* mobile / no-webgl fallback grid of cards */
-.reel-fallback {
-  display: none;
-  list-style: none;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-  grid-column: 1 / -1;
-}
-.reel-fallback li {
-  padding: 1.4rem;
-  border-radius: 16px;
-  border: 1px solid var(--hair);
-  border-top: 2px solid var(--a, var(--teal));
-  background: var(--glass);
-  backdrop-filter: blur(14px);
-}
-.reel-fallback .rf-no {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--teal);
-}
-.reel-fallback h3 {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 1.3rem;
-  margin: 0.4rem 0 0.6rem;
-}
-.reel-fallback p {
-  color: var(--ink-dim);
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-.reel.no-webgl .reel-canvas { display: none; }
-.reel.no-webgl .reel-fallback { display: grid; }
-
-/* ============================ THE DIVE (scroll-scrubbed video) ========== */
-.dive {
-  position: relative;
-  z-index: 1;
-  height: 380vh; /* scrub distance for the plunge */
-}
-.dive-stage {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow: hidden;
-  background: var(--bg);
-}
-.dive-video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scale(var(--vid-scale, 1));
-  transform-origin: center 46%;
-  will-change: transform;
-}
-.dive-scrim {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(
-    circle at 50% 46%,
-    transparent 28%,
-    rgba(5, 6, 10, var(--dive-vig, 0.4)) 100%
-  );
-  box-shadow: inset 0 0 220px 50px rgba(5, 6, 10, 0.7);
-}
-.dive-words {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  perspective: 800px;
-}
-.dive-word {
-  position: absolute;
-  left: 50%;
-  top: 46%;
-  transform: translate(-50%, -50%) scale(0.2);
-  opacity: 0;
-  font-family: var(--font-display);
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: clamp(2.6rem, 9vw, 9rem);
-  letter-spacing: -0.03em;
-  line-height: 1;
-  color: var(--ink);
-  white-space: nowrap;
-  text-shadow: 0 0 70px rgba(39, 242, 192, 0.45), 0 0 30px rgba(124, 92, 255, 0.4);
-  will-change: transform, opacity, filter;
-}
-.dive-hud {
-  position: absolute;
-  left: 50%;
-  bottom: clamp(2rem, 7vh, 5rem);
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.55rem;
-  text-align: center;
-  z-index: 3;
-}
-.dive-kicker {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.34em;
-  text-transform: uppercase;
-  color: var(--teal);
-  text-shadow: 0 0 16px rgba(39, 242, 192, 0.5);
-}
-.dive-sub {
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.16em;
-  color: var(--ink-faint);
-}
-@media (prefers-reduced-motion: reduce) {
-  .dive {
-    height: 130vh;
-  }
-  .dive-words {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 0 0.35em;
-    padding: 0 8vw;
-    perspective: none;
-  }
-  .dive-word {
-    position: static;
-    transform: none !important;
-    opacity: 1 !important;
-    filter: none !important;
-    font-size: clamp(2rem, 7vw, 5rem);
-  }
-}
-
 /* ============================ PORTAL (Act III finale) =================== */
 .portal {
   position: relative;
@@ -1153,6 +1040,13 @@ body.in-act2 .ascend {
     radial-gradient(45% 45% at 50% 50%, rgba(39, 242, 192, 0.3), transparent 60%),
     radial-gradient(70% 70% at 50% 50%, rgba(124, 92, 255, 0.22), transparent 65%),
     var(--bg);
+}
+.portal-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(60% 58% at 50% 56%, rgba(5, 6, 10, 0.68), transparent 72%);
 }
 .portal-ui {
   position: relative;
@@ -1266,46 +1160,6 @@ body.in-act2 .ascend {
 
 /* ============================ responsive (Act II/III) =================== */
 @media (max-width: 860px) {
-  /* keep the work-reel 3D on phones — full-width canvas, tappable legend + detail
-     stacked beneath it (the canvas hosts the same shader tiles as desktop). */
-  .reel-canvas {
-    min-height: 54vh;
-    touch-action: pan-y; /* tap activates a tile; vertical swipe still scrolls */
-  }
-  .reel-ui {
-    grid-template-columns: 1fr;
-    gap: 1.3rem;
-    margin-top: 1.4rem;
-  }
-  .reel-legend {
-    order: 1; /* chips first: tap to drive the tile above */
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    border-top: none;
-  }
-  .reel-detail {
-    order: 2;
-  }
-  .rl {
-    width: auto;
-    padding: 0.5rem 0.9rem;
-    border: 1px solid var(--hair);
-    border-radius: 999px;
-  }
-  .rl:hover,
-  .rl:focus-visible,
-  .rl[data-on='true'] {
-    padding-left: 0.9rem;
-    border-color: var(--hair-teal);
-  }
-  .rl-title {
-    font-size: 0.92rem;
-  }
-  .rd-title {
-    font-size: clamp(1.8rem, 7vw, 2.6rem);
-  }
-
   /* filmstrip mobile */
   .film-numeral {
     top: 4vh;
@@ -1322,4 +1176,309 @@ body.in-act2 .ascend {
 @media (prefers-reduced-motion: reduce) {
   .portal-cta-ring { animation: none; }
   .film-rail-fill { transition: none; }
+}
+
+/* ============================================================================
+   THE SPIRE — city canvas + HUD + engagement tiers (the v3 descent chrome)
+   ========================================================================== */
+
+/* --- the persistent megacity canvas --------------------------------------
+   Fixed behind every Act II section (above the aurora, below the content).
+   Fades in across the first descent viewport via --city (set by DownwardWorld)
+   and blacks out entirely while an opaque section (the Portal) owns the
+   viewport — the frameloop pauses at the same moment. */
+.city-fix {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--city, 0);
+  transition: opacity 0.5s ease;
+}
+.city-fix.is-covered {
+  opacity: 0 !important;
+}
+.city-fix canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* --- the Spire HUD ---------------------------------------------------------
+   Floor counter + altitude + current division + the DNA progress rail. The
+   connective instrument that makes 250 floors legible as one continuous drop. */
+.spire-hud {
+  position: fixed;
+  right: clamp(0.7rem, 2.2vw, 1.8rem);
+  top: 50%;
+  transform: translateY(-50%) translateX(14px);
+  z-index: 13; /* above act2 content (via act2-root z12); below the cursor */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1.1rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+body.in-act2 .spire-hud {
+  opacity: 1;
+  transform: translateY(-50%);
+}
+.hud-floor {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+}
+.hud-floor-no {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 3.4vw, 3.1rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 26px rgba(39, 242, 192, 0.45);
+}
+.hud-floor-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.3em;
+  color: var(--ink-faint);
+}
+.hud-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+}
+.hud-division {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--teal);
+  text-shadow: 0 0 14px rgba(39, 242, 192, 0.55);
+  max-width: 11rem;
+  text-align: right;
+}
+.hud-rail {
+  position: relative;
+  height: min(34vh, 300px);
+  width: 24px;
+}
+.hud-helix {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.hud-helix path {
+  fill: none;
+  stroke: rgba(238, 240, 246, 0.22);
+  stroke-width: 1.1;
+}
+.hud-helix path:first-child {
+  stroke: rgba(39, 242, 192, 0.5);
+}
+.hud-dot {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 9px;
+  height: 9px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 10px var(--teal), 0 0 24px rgba(39, 242, 192, 0.7);
+}
+
+/* --- WAYS IN · engagement tiers ------------------------------------------ */
+.engage-head {
+  margin-bottom: clamp(2.2rem, 5vh, 4rem);
+}
+.engage-head .lede {
+  max-width: 62ch;
+}
+.engage-tiers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(0.9rem, 2vw, 1.6rem);
+}
+.tier {
+  position: relative;
+  padding: clamp(1.4rem, 2.6vw, 2.2rem);
+  overflow: hidden;
+}
+.tier::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(80% 60% at 50% 0%, rgba(154, 230, 255, 0.1), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.tier:hover::after {
+  opacity: 1;
+}
+.tier-no {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.3em;
+  color: var(--ink-faint);
+}
+.tier-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-top: 0.9rem;
+}
+.tier-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: clamp(1.25rem, 1.9vw, 1.7rem);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.tier-window {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+.tier-price {
+  display: inline-block;
+  margin-top: 0.8rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 2.6vw, 2.2rem);
+  color: var(--teal);
+  text-shadow: 0 0 26px rgba(39, 242, 192, 0.45);
+}
+.tier-body {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #b3bbcf;
+}
+.engage-retainer {
+  margin-top: clamp(1rem, 2.4vw, 1.8rem);
+  padding: clamp(1.2rem, 2.4vw, 2rem);
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: baseline;
+  gap: 0.6rem 1.6rem;
+  border-color: rgba(154, 230, 255, 0.3);
+}
+.er-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: clamp(1.15rem, 1.8vw, 1.5rem);
+  color: #9ae6ff;
+  text-shadow: 0 0 22px rgba(154, 230, 255, 0.5);
+}
+.er-price {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  color: var(--ink);
+}
+.er-body {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #b3bbcf;
+}
+
+/* --- trust strip ----------------------------------------------------------- */
+.trust-head {
+  margin-top: clamp(2.6rem, 6vh, 4.6rem);
+}
+.trust-head .kicker {
+  margin-bottom: 0.4rem;
+}
+.trust-strip {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(0.8rem, 1.8vw, 1.4rem);
+  margin-top: 1.2rem;
+}
+.trust-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid var(--hair);
+  border-radius: 14px;
+  background: rgba(5, 6, 10, 0.45);
+  backdrop-filter: blur(10px);
+}
+.trust-item strong {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--teal);
+}
+.trust-item span {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: #aab2c6;
+}
+
+/* --- responsive + reduced motion for the Spire chrome ---------------------- */
+@media (max-width: 1080px) {
+  .engage-tiers {
+    grid-template-columns: 1fr;
+  }
+  .engage-retainer {
+    grid-template-columns: 1fr;
+  }
+  .trust-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 860px) {
+  /* phones: Act I's caption block owns the bottom center, so the descend cue
+     keeps only its slim edge arrow; the label would collide with the title */
+  .descend-label {
+    display: none;
+  }
+  .spire-hud {
+    top: auto;
+    bottom: calc(clamp(1.1rem, 3vw, 2.2rem) + 3.6rem); /* clear of the ascend pill */
+    right: clamp(0.7rem, 3vw, 1.2rem);
+    transform: translateY(0) translateX(14px);
+    gap: 0.5rem;
+  }
+  body.in-act2 .spire-hud {
+    transform: translateY(0);
+  }
+  .hud-rail {
+    display: none;
+  }
+  .hud-division {
+    display: none; /* phones: sections carry their own headers; the label was
+      colliding with the filmstrip's bottom-left index */
+  }
+  .hud-floor-no {
+    font-size: 1.5rem;
+  }
+  .trust-strip {
+    grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .city-fix {
+    transition: none;
+  }
+  .spire-hud {
+    transition: opacity 0.3s ease;
+  }
 }

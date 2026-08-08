@@ -45,7 +45,7 @@ export const CAPABILITIES: Capability[] = [
     title: 'AI Voice Agents',
     kicker: 'Voice AI',
     description:
-      'Lifelike voice agents that answer, qualify, and book — 24/7, in any language, indistinguishable from your best rep.',
+      'Lifelike voice agents that answer, qualify, and book 24/7, in any language, indistinguishable from your best rep.',
     role: 'Realtime Voice',
     year: '2026',
     href: '#',
@@ -57,7 +57,7 @@ export const CAPABILITIES: Capability[] = [
     title: 'Workflow Automation',
     kicker: 'Orchestration',
     description:
-      'n8n-grade pipelines that wire your entire stack into one autonomous nervous system — triggers, logic, and action.',
+      'n8n-grade pipelines that wire your entire stack into one autonomous nervous system: triggers, logic, and action.',
     role: 'Automation',
     year: '2026',
     href: '#',
@@ -69,7 +69,7 @@ export const CAPABILITIES: Capability[] = [
     title: 'AI Receptionist',
     kicker: 'Inbound',
     description:
-      'Every inbound call answered instantly, routed intelligently, and logged — never a missed lead again.',
+      'Every inbound call answered instantly, routed intelligently, and logged. Never a missed lead again.',
     role: 'Inbound AI',
     year: '2026',
     href: '#',
@@ -105,7 +105,7 @@ export const CAPABILITIES: Capability[] = [
     title: 'Insight Cortex',
     kicker: 'Analytics',
     description:
-      'Real-time analytics across every call, flow, and conversion — the signal beneath the automation.',
+      'Real-time analytics across every call, flow, and conversion: the signal beneath the automation.',
     role: 'Analytics',
     year: '2026',
     href: '#',
@@ -118,7 +118,7 @@ export const ABOUT = {
   heading: 'We build the autonomous layer of your business.',
   body: [
     'Hanflux AI fuses human-grade voice agents with deep workflow automation into a single, self-operating ecosystem.',
-    'From the first ring to the final follow-up, every interaction is captured, understood, and acted on — at machine speed, with human warmth.',
+    'From the first ring to the final follow-up, every interaction is captured, understood, and acted on. At machine speed, with human warmth.',
   ],
   stats: [
     { value: '24/7', label: 'always-on agents' },

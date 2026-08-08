@@ -10,4 +10,9 @@ export const scrollState = {
   pointerY: 0,
   active: -1, // index of the focused capability card (-1 = none)
   portalProgress: 0, // 0..1 how "open" the Act III portal is (scroll-driven)
+  // --- the Spire descent -------------------------------------------------
+  descent: 0, // 0 at the crown (threshold) → 1 at street level (portal)
+  chapter: 0, // index of the section currently owning the viewport
+  divisionColor: '#27f2c0', // active division accent — grades the whole city
+  hudLabel: 'THE CROWN', // current chapter/division name shown in the HUD
 }

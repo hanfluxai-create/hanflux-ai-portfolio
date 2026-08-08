@@ -6,6 +6,18 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 5173
+    },
+    {
+      "name": "hydra-5273",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "5273", "--strictPort"],
+      "port": 5273
+    },
+    {
+      "name": "hanflux-reel",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4501", "--directory", "/Users/chitrakshmayank/Downloads/oraya-growth-engine/reels-batch-01"],
+      "port": 4501
     }
   ]
 }

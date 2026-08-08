@@ -45,7 +45,7 @@ export function Overlay() {
           type="button"
           data-hover
           onClick={() => requestFlyTo('work')}
-          aria-label={`${BRAND.name} — go to Work`}
+          aria-label={`${BRAND.name}: go to Work`}
         >
           {BRAND.wordmark}
           <span className="wordmark-mark">°</span>
@@ -70,7 +70,7 @@ export function Overlay() {
         <span className="work-kicker">{active?.kicker}</span>
         <h2 className="work-title">{active?.title}</h2>
         <p className="work-hint">
-          drag · scroll · or ask — {activeIndex + 1} / {CAPABILITIES.length}
+          drag · scroll · or ask · {activeIndex + 1} / {CAPABILITIES.length}
         </p>
         <div className="work-dots" aria-hidden="true">
           {CAPABILITIES.map((c, i) => (

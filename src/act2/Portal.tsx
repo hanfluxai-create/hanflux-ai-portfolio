@@ -97,10 +97,20 @@ export function Portal({ webgl = true }: { webgl?: boolean }) {
   const { kicker, title, body, button, email, socials } = ACT3.portal
 
   return (
-    <section className="portal" ref={section} id="contact">
+    <section
+      className="portal"
+      ref={section}
+      id="contact"
+      data-division="STREET LEVEL"
+      data-accent="#27F2C0"
+    >
       <div className="portal-canvas" aria-hidden="true">
         {live ? <TunnelCanvas /> : <div className="portal-fallback" />}
       </div>
+      {/* the tunnel's hot core blows out near-white at full uProgress — this
+          keeps the closing line legible right at the climax instead of
+          washing out against it */}
+      <div className="portal-scrim" aria-hidden="true" />
 
       <div className="portal-ui">
         <p className="kicker">{kicker}</p>
