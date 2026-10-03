@@ -1,7 +1,8 @@
 /**
- * ACT II — "THE SPIRE" — all copy in one place.
- * The vertical AI campus you descend past for the whole act: divisions, proof,
- * process, and pricing. Edit text/data here — no component edits needed.
+ * ACT II · "THE LATTICE" · all copy in one place.
+ * A forward flight through a living Matrix: divisions, proof, process, and
+ * pricing. Each section is a station the camera flies to. Edit text/data
+ * here, no component edits needed.
  *
  * Voice: confident, specific, anti-hype. Grounded in 2026 market research:
  *  · MIT "GenAI Divide": 95% of enterprise AI pilots never touch P&L; externally
@@ -17,21 +18,37 @@
  */
 
 export const ACT2 = {
-  // The threshold between Act I and Act II — the crown of the Spire
+  // The threshold between Act I and Act II: the uplink into the Lattice
   threshold: {
-    kicker: 'YOU ARE ENTERING THE SPIRE',
+    kicker: 'you are entering the lattice',
     title: ['ONE MACHINE.', 'EVERY WORKFLOW.'],
-    sub: 'This is where AI stops being a demo. Voice, agents, orchestration, memory, growth, and the ops layer that keeps it all alive after launch. Descend.',
-    cue: 'begin the descent',
+    sub: 'This is where AI stops being a demo. Voice, agents, orchestration, memory, growth, and the ops layer that keeps it all alive after launch. Keep scrolling to fly in.',
+    boot: [
+      'opening uplink to hanflux',
+      'six divisions online',
+      'evals passing, humans on the loop',
+      'scroll to fly in',
+    ],
+    cue: 'jack in',
   },
 
-  // The divisions — rendered as the pinned filmstrip. `a` is the division
-  // accent that grades the entire city.
+  // HUD labels per station (lowercase, shown after a > prompt)
+  hud: {
+    threshold: 'uplink',
+    loop: 'build loop',
+    buildLog: 'build log',
+    stack: 'the stack',
+    metrics: 'proof',
+    engage: 'ways in',
+  },
+
+  // The divisions: six stations, each with a 3D construct in the Lattice.
+  // `a` is the division accent that regrades the whole world.
   capabilities: [
     {
       id: 'voice',
       no: '01',
-      tag: 'VOICE DIVISION',
+      tag: 'voice division',
       title: 'AI Voice Agents',
       blurb:
         'Picks up before the second ring, in any language, and books the job while your competitor’s phone is still ringing. Speed-to-lead is a solved problem here.',
@@ -46,7 +63,7 @@ export const ACT2 = {
     {
       id: 'foundry',
       no: '02',
-      tag: 'AGENT FOUNDRY',
+      tag: 'agent foundry',
       title: 'Custom Agents & Skills',
       blurb:
         'Claude agents shaped to your exact workflow: they read your tools over MCP, plan multi-step work, and check their own output against a rubric before you ever see it.',
@@ -61,7 +78,7 @@ export const ACT2 = {
     {
       id: 'orchestration',
       no: '03',
-      tag: 'ORCHESTRATION',
+      tag: 'orchestration',
       title: 'Workflow Automation',
       blurb:
         'An n8n nervous system wiring your entire stack into one graph: triggers, branching, retries with backoff, and a human checkpoint before anything irreversible fires.',
@@ -76,7 +93,7 @@ export const ACT2 = {
     {
       id: 'memory',
       no: '04',
-      tag: 'MEMORY VAULT',
+      tag: 'memory vault',
       title: 'RAG & Knowledge Systems',
       blurb:
         'Your documents, tickets and tribal knowledge become an answer engine where every response traces to a real source. Permission-aware, current, never a guess.',
@@ -91,7 +108,7 @@ export const ACT2 = {
     {
       id: 'growth',
       no: '05',
-      tag: 'GROWTH ENGINE',
+      tag: 'growth engine',
       title: 'Revenue Systems',
       blurb:
         'Outbound that researches, personalises and books while you sleep. Inbound where no call, chat or form ever goes unanswered. Pipeline without headcount.',
@@ -106,7 +123,7 @@ export const ACT2 = {
     {
       id: 'ops',
       no: '06',
-      tag: 'SPIRE OPS · FLAGSHIP',
+      tag: 'lattice ops, our flagship',
       title: 'AI Reliability Ops',
       blurb:
         'The layer nobody else sells: we run your AI after it ships. Evals, monitoring, drift detection, cost tuning, model migrations. SRE for your agents, as a product.',
@@ -123,7 +140,7 @@ export const ACT2 = {
   // The build loop — process transparency as proof. This is the eval loop
   // buyers never get shown: how we decide ship / no-ship.
   loop: {
-    kicker: 'HOW A SYSTEM GETS BUILT',
+    kicker: 'how a system gets built',
     title: 'We don’t demo. We deploy, prove, and keep it alive.',
     steps: [
       {
@@ -151,7 +168,7 @@ export const ACT2 = {
 
   // The build log — a running, specific record of what actually gets wired.
   buildLog: {
-    kicker: 'THE BUILD LOG',
+    kicker: 'tail -f build.log',
     title: 'Not a menu. A running log of what gets wired.',
     sub: 'Pull any line. We scope it this week.',
     entries: [
@@ -220,7 +237,7 @@ export const ACT2 = {
 
   // The stack we wield — honest credibility, model-agnostic by design
   stack: {
-    kicker: 'THE STACK WE WIELD',
+    kicker: 'the stack we wield',
     title: 'Best-in-class parts, welded into one machine.',
     groups: [
       {
@@ -246,7 +263,7 @@ export const ACT2 = {
   // Ways in — transparent fixed-fee tiers. None of the market publishes
   // pricing; this section is deliberately the exception.
   engage: {
-    kicker: 'WAYS IN',
+    kicker: 'ways in',
     title: 'Three doors. Fixed fees. No mystery.',
     sub: 'MIT found 95% of enterprise AI pilots never touch the P&L, and that externally built systems reach production twice as often. Closing that gap is our entire business, so every phase is fixed-fee, and part of it can ride on the KPI we commit to.',
     tiers: [
@@ -273,7 +290,7 @@ export const ACT2 = {
       },
     ],
     retainer: {
-      name: 'SPIRE OPS',
+      name: 'LATTICE OPS',
       price: 'from $1,500/mo',
       body: 'The service that never sleeps: monitoring, evals, drift alerts, cost tuning, model migrations, and a new automation shipped every month.',
     },
@@ -281,7 +298,7 @@ export const ACT2 = {
 
   // Trust strip — the four questions every AI buyer actually asks, answered
   trust: {
-    kicker: 'THE FINE PRINT, UP FRONT',
+    kicker: 'the fine print, up front',
     items: [
       { title: 'Your data trains nothing', body: 'Never used to train anyone’s models. In the contract, in writing.' },
       { title: 'Model-agnostic', body: 'Claude, GPT, Gemini or open weights: the best model per job. You are never locked in.' },
@@ -292,7 +309,7 @@ export const ACT2 = {
 
   // Final CTA (the Portal carries the primary close; kept for reuse)
   cta: {
-    kicker: 'STREET LEVEL',
+    kicker: 'end of line',
     title: ['Get your AI', 'into production.'],
     body: 'Tell us the work you keep doing by hand. We’ll wire the voice, the agents and the automations that make it run itself. Then we’ll keep them alive.',
     email: 'hello@hanflux.ai',

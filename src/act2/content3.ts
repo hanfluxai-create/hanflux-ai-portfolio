@@ -8,7 +8,7 @@
 
 export const ACT3 = {
   portal: {
-    kicker: 'STREET LEVEL · THE DESCENT ENDS HERE',
+    kicker: 'END OF THE LATTICE · YOUR MOVE',
     title: ['Get your AI', 'into production.'],
     body: 'Tell us the work you keep doing by hand. We’ll wire the voice, the agents and the automations that make it run itself. Then we’ll keep them alive. First door: a fixed-fee Signal Audit, yours to keep.',
     button: 'Start with a Signal Audit',

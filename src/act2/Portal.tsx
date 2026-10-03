@@ -101,7 +101,7 @@ export function Portal({ webgl = true }: { webgl?: boolean }) {
       className="portal"
       ref={section}
       id="contact"
-      data-division="STREET LEVEL"
+      data-division="end of line"
       data-accent="#27F2C0"
     >
       <div className="portal-canvas" aria-hidden="true">
