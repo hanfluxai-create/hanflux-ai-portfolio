@@ -1,0 +1,6 @@
+{
+  "redirects": [
+    { "source": "/legal", "destination": "https://legal.hanflux.ai/", "permanent": false },
+    { "source": "/legal/:path*", "destination": "https://legal.hanflux.ai/:path*", "permanent": false }
+  ]
+}

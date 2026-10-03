@@ -16,6 +16,10 @@ export const ACT3 = {
     // add WhatsApp ({ label: 'WhatsApp', href: 'https://wa.me/<E.164 digits>' })
     // and X ({ label: 'X', href: 'https://x.com/<handle>' }) once the real
     // handles exist — placeholder dead links ship nowhere
-    socials: [{ label: 'Email', href: 'mailto:hello@hanflux.ai' }],
+    socials: [
+      { label: 'Email', href: 'mailto:hello@hanflux.ai' },
+      // /legal redirects to legal.hanflux.ai (see vercel.json)
+      { label: 'Legal', href: '/legal' },
+    ],
   },
 }
