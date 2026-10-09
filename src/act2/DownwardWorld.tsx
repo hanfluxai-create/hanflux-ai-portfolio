@@ -10,7 +10,10 @@ import { CAPABILITIES } from '../config/content'
 import { LatticeWorld } from './lattice/LatticeWorld'
 import { LATTICE } from './lattice/shared'
 import { Divisions } from './Divisions'
-import { Portal } from './Portal'
+import { Portal, CalGlyph } from './Portal'
+import { bookingProps, preloadCal } from './cal'
+import { CONTACT } from './contact'
+import { Magnetic } from './kinetic'
 import { Decode, TermLines } from './decode'
 import './act2.css'
 
@@ -77,7 +80,8 @@ export function DownwardWorld({ webgl = true }: { webgl?: boolean }) {
       // page scroll drives BOTH the Act I carousel (via the hero region) and the
       // flight, so Lenis must not ignore the canvas; only the chat navigator
       // (its scrollable reply log keeps its own wheel).
-      prevent: (node) => !!node?.closest?.('.chatnav'),
+      // the Cal.com booking modal scrolls itself; never scroll the page under it
+      prevent: (node) => !!node?.closest?.('.chatnav, cal-modal-box'),
     })
     lenisRef.current = lenis
     // dev-only handle for deterministic scroll jumps while verifying
@@ -299,6 +303,22 @@ export function DownwardWorld({ webgl = true }: { webgl?: boolean }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
+  // --- booking: warm the Cal embed on idle; the dock yields to the Portal CTA --
+  useEffect(() => {
+    preloadCal()
+    const portal = document.getElementById('contact')
+    if (!portal) return
+    const io = new IntersectionObserver(
+      ([e]) => document.body.classList.toggle('portal-in', e.isIntersecting),
+      { threshold: 0.25 },
+    )
+    io.observe(portal)
+    return () => {
+      io.disconnect()
+      document.body.classList.remove('portal-in')
+    }
+  }, [])
+
   // --- one orchestrated "print" per block: rows type in as a block arrives --
   useEffect(() => {
     const root = scope.current
@@ -387,6 +407,13 @@ export function DownwardWorld({ webgl = true }: { webgl?: boolean }) {
         <span className="descend-label">{ACT2.threshold.cue}</span>
         <span className="descend-arrow" />
       </button>
+
+      {/* persistent booking dock (Act II only; steps aside while the Portal's own CTA is on screen) */}
+      <a className="book-dock" data-hover aria-label={`${CONTACT.booking.button} (opens a scheduler)`} {...bookingProps}>
+        <span className="book-dock-dot" aria-hidden="true" />
+        <CalGlyph />
+        <span>{CONTACT.booking.short}</span>
+      </a>
 
       {/* persistent back-to-top control (only visible once in Act II) */}
       <button className="ascend" onClick={surface} data-hover aria-label="Back to the top">
@@ -534,6 +561,16 @@ export function DownwardWorld({ webgl = true }: { webgl?: boolean }) {
             <span className="rt-name">{ACT2.engage.retainer.name}</span>
             <span className="rt-price">{ACT2.engage.retainer.price}</span>
             <p className="rt-body">{ACT2.engage.retainer.body}</p>
+          </div>
+          <div className="engage-book">
+            <div className="engage-book-copy">
+              <p className="engage-book-line">{ACT2.engage.book.line}</p>
+              <p className="engage-book-sub">{ACT2.engage.book.sub}</p>
+            </div>
+            <Magnetic as="a" className="book-btn" strength={0.3} {...bookingProps}>
+              <CalGlyph />
+              <span>{CONTACT.booking.button}</span>
+            </Magnetic>
           </div>
           <div className="fineprint" data-print>
             <p className="lx-prompt">{ACT2.trust.kicker}</p>

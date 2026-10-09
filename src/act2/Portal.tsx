@@ -13,6 +13,8 @@ import { type Mesh } from 'three'
 import { ACT3 } from './content3'
 import { scrollState } from './scrollState'
 import { SplitReveal, Magnetic } from './kinetic'
+import { CONTACT } from './contact'
+import { bookingProps } from './cal'
 import './shaders' // registers <portalMaterial> + types
 
 gsap.registerPlugin(ScrollTrigger)
@@ -60,6 +62,17 @@ function TunnelCanvas() {
     >
       <Tunnel />
     </Canvas>
+  )
+}
+
+/** a tiny month grid with one lit day: the slot you are about to pick */
+export function CalGlyph() {
+  return (
+    <svg className="cal-glyph" viewBox="0 0 20 20" aria-hidden="true">
+      <rect x="2.5" y="4" width="15" height="13.5" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M2.5 8h15M6.5 2.5v3M13.5 2.5v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <rect className="cal-glyph-day" x="11.2" y="10.6" width="3.6" height="3.6" rx="0.9" />
+    </svg>
   )
 }
 
@@ -119,14 +132,25 @@ export function Portal({ webgl = true }: { webgl?: boolean }) {
         </SplitReveal>
         <p className="portal-body">{body}</p>
 
-        <Magnetic as="a" className="portal-cta" href={`mailto:${email}`} strength={0.45}>
+        <Magnetic as="a" className="portal-cta" strength={0.45} {...bookingProps}>
+          <CalGlyph />
           <span>{button}</span>
           <span className="portal-cta-ring" aria-hidden="true" />
         </Magnetic>
+        <p className="portal-cta-note">{CONTACT.booking.note}</p>
 
-        <a className="portal-email" href={`mailto:${email}`} data-hover>
-          {email}
-        </a>
+        <address className="portal-contact">
+          <a className="portal-email" href={`mailto:${email}`} data-hover>
+            {email}
+          </a>
+          <span className="portal-phones">
+            {CONTACT.phones.map((ph) => (
+              <a key={ph.href} className="portal-phone" href={ph.href} data-hover>
+                {ph.label}
+              </a>
+            ))}
+          </span>
+        </address>
 
         <ul className="portal-socials">
           {socials.map((s) => (

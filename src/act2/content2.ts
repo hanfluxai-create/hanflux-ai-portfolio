@@ -294,6 +294,10 @@ export const ACT2 = {
       price: 'from $1,500/mo',
       body: 'The service that never sleeps: monitoring, evals, drift alerts, cost tuning, model migrations, and a new automation shipped every month.',
     },
+    book: {
+      line: 'Not sure which door is yours?',
+      sub: 'Fifteen minutes on a call and you leave knowing which one, and what it costs.',
+    },
   },
 
   // Trust strip — the four questions every AI buyer actually asks, answered
@@ -312,7 +316,7 @@ export const ACT2 = {
     kicker: 'end of line',
     title: ['Get your AI', 'into production.'],
     body: 'Tell us the work you keep doing by hand. We’ll wire the voice, the agents and the automations that make it run itself. Then we’ll keep them alive.',
-    email: 'hello@hanflux.ai',
+    email: 'hanfluxai@gmail.com',
     button: 'Get your AI into production',
   },
 }

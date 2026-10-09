@@ -1373,3 +1373,186 @@ body.in-act2 .lx-hud {
     transition: none;
   }
 }
+
+/* ============================ BOOKING (Cal.com) ============================
+   Three surfaces, one control: the Portal's primary CTA, the "which door?" row
+   under the fees, and a persistent dock. All open the same Cal modal. */
+.cal-glyph {
+  width: 1.15em;
+  height: 1.15em;
+  flex: none;
+}
+.cal-glyph-day {
+  fill: currentColor;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+a:hover > .cal-glyph .cal-glyph-day,
+a:focus-visible > .cal-glyph .cal-glyph-day {
+  transform: scale(1.45);
+}
+
+/* Portal CTA picks up the glyph; note + contact block sit under it */
+.portal-cta { gap: 0.7rem; }
+.portal-cta-note {
+  margin-top: -0.4rem;
+  font-family: var(--f-term);
+  font-size: 0.72rem;
+  color: var(--lx-dim);
+}
+.portal-contact {
+  font-style: normal;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 0.4rem;
+}
+.portal-phones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 1.4rem;
+}
+.portal-phone {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  opacity: 0.85;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s ease, opacity 0.3s ease;
+}
+.portal-phone:hover { color: var(--teal); opacity: 1; }
+
+/* the solid phosphor button: the only filled control in the Lattice */
+.book-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 1rem 1.6rem;
+  border-radius: 999px;
+  background: var(--lx-phos);
+  color: var(--lx-void);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  white-space: nowrap;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow: 0 0 0 1px rgba(39, 242, 192, 0.5), 0 14px 44px rgba(39, 242, 192, 0.28);
+  transition: box-shadow 0.35s ease;
+}
+.book-btn::after {
+  /* one sweep of light across the face on hover */
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%);
+  transform: translateX(-120%);
+}
+.book-btn:hover {
+  box-shadow: 0 0 0 1px rgba(76, 240, 255, 0.8), 0 18px 60px rgba(76, 240, 255, 0.4);
+}
+.book-btn:hover::after {
+  transform: translateX(120%);
+  transition: transform 0.8s ease;
+}
+.book-btn:focus-visible,
+.portal-cta:focus-visible,
+.book-dock:focus-visible {
+  outline: 2px solid var(--lx-cyan);
+  outline-offset: 4px;
+}
+
+.engage-book {
+  margin-top: clamp(2.2rem, 4.5vw, 3.6rem);
+  padding-top: clamp(1.6rem, 3vw, 2.4rem);
+  border-top: 1px solid var(--lx-line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.4rem 2.4rem;
+  flex-wrap: wrap;
+}
+.engage-book-line {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.5rem, 2.6vw, 2.2rem);
+  line-height: 1.05;
+  color: var(--lx-ink);
+  text-wrap: balance;
+}
+.engage-book-sub {
+  margin-top: 0.55rem;
+  max-width: 48ch;
+  font-size: 0.97rem;
+  line-height: 1.55;
+  color: var(--lx-dim);
+}
+
+/* persistent dock: bottom-left, where the Act I chat button lived */
+.book-dock {
+  position: fixed;
+  left: clamp(1.1rem, 3vw, 2.4rem);
+  bottom: clamp(1.1rem, 3vw, 2.2rem);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 1.1rem 0.7rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid var(--hair-teal);
+  background: rgba(1, 11, 8, 0.72);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  color: var(--lx-ink);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.85rem;
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.4s ease, transform 0.4s ease, visibility 0s linear 0.4s;
+}
+.book-dock .cal-glyph { color: var(--lx-phos); }
+body.in-act2:not(.portal-in) .book-dock {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  visibility: visible;
+  transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.3s ease, background 0.3s ease, visibility 0s;
+}
+.book-dock:hover {
+  border-color: var(--lx-phos);
+  background: rgba(39, 242, 192, 0.12);
+}
+.book-dock-dot {
+  /* "slots open" signal */
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--lx-phos);
+  box-shadow: 0 0 10px var(--lx-phos);
+  animation: dock-blink 2.4s ease-in-out infinite;
+}
+@keyframes dock-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+@media (max-width: 640px) {
+  .engage-book { flex-direction: column; align-items: stretch; }
+  .book-btn { justify-content: center; }
+  .portal-phones { flex-direction: column; align-items: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .book-dock-dot { animation: none; }
+  .book-btn:hover::after { transition: none; transform: translateX(-120%); }
+  .cal-glyph-day { transition: none; }
+}

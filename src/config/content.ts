@@ -12,7 +12,7 @@ export const BRAND = {
     'Autonomous voice agents and end-to-end workflow automation, woven into one living system that answers, acts, and scales while you sleep.',
   vibeWords: ['autonomous', 'neural', 'fluid', 'futuristic', 'intelligent'],
   contact: {
-    email: 'hello@hanflux.ai',
+    email: 'hanfluxai@gmail.com',
     socials: [
       { label: 'X', href: 'https://x.com/' },
       { label: 'LinkedIn', href: 'https://linkedin.com/' },
