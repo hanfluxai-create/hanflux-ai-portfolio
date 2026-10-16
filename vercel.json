@@ -1,6 +1,14 @@
 {
+  "cleanUrls": true,
   "redirects": [
     { "source": "/legal", "destination": "https://legal.hanflux.ai/", "permanent": false },
-    { "source": "/legal/:path*", "destination": "https://legal.hanflux.ai/:path*", "permanent": false }
+    { "source": "/legal/:path*", "destination": "https://legal.hanflux.ai/:path*", "permanent": false },
+    { "source": "/privacy-policy", "destination": "/privacy", "permanent": true },
+    { "source": "/terms-of-service", "destination": "/terms", "permanent": true },
+    { "source": "/terms-and-conditions", "destination": "/terms", "permanent": true },
+    { "source": "/tos", "destination": "/terms", "permanent": true },
+    { "source": "/acceptable-use-policy", "destination": "/acceptable-use", "permanent": true },
+    { "source": "/aup", "destination": "/acceptable-use", "permanent": true },
+    { "source": "/cookie-policy", "destination": "/cookies", "permanent": true }
   ]
 }

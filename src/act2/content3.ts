@@ -19,6 +19,10 @@ export const ACT3 = {
     socials: [
       // /legal redirects to legal.hanflux.ai (see vercel.json)
       { label: 'Legal', href: '/legal' },
+      // static policy pages in public/, clean URLs via vercel.json. Google's
+      // OAuth verification needs the homepage to link the privacy policy.
+      { label: 'Privacy', href: '/privacy' },
+      { label: 'Terms', href: '/terms' },
     ],
   },
 }
