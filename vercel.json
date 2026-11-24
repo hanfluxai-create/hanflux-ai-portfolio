@@ -58,6 +58,18 @@
       "destination": "https://hanflux-design-menu.vercel.app/factory/"
     },
     {
+      "source": "/factory/:a/",
+      "destination": "https://hanflux-design-menu.vercel.app/factory/:a/"
+    },
+    {
+      "source": "/factory/:a/:b/",
+      "destination": "https://hanflux-design-menu.vercel.app/factory/:a/:b/"
+    },
+    {
+      "source": "/factory/:a/:b/:c/",
+      "destination": "https://hanflux-design-menu.vercel.app/factory/:a/:b/:c/"
+    },
+    {
       "source": "/factory/:path*",
       "destination": "https://hanflux-design-menu.vercel.app/factory/:path*"
     }
